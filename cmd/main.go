@@ -5,6 +5,7 @@ import (
 	"github.com/BurntSushi/toml"
 	web "github.com/labi-le/control-panel/http"
 	"github.com/labi-le/control-panel/internal"
+	"github.com/labi-le/control-panel/structures"
 	"log"
 )
 
@@ -18,7 +19,7 @@ func init() {
 
 func main() {
 	flag.Parse()
-	Config := internal.Config{}
+	Config := structures.Config{}
 
 	_, err := toml.DecodeFile(config, &Config)
 
