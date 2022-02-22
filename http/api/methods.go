@@ -33,6 +33,7 @@ func (m *Methods) GetVirtualMemory() *Methods {
 
 		return m
 	}
+
 	m.resp.Success = true
 	m.resp.Message = "Mem has been retrieved"
 	m.resp.Data = Mem
@@ -40,50 +41,53 @@ func (m *Methods) GetVirtualMemory() *Methods {
 	return m
 }
 
-// GetCpuInfo returns cpu statistics.
-func (m *Methods) GetCpuInfo() *Methods {
-	Cpu, err := internal.GetCpuInfo()
+// GetCPUInfo returns cpu statistics.
+func (m *Methods) GetCPUInfo() *Methods {
+	CPU, err := internal.GetCPUInfo()
 	if err != nil {
 		m.resp.Success = false
 		m.resp.Message = err.Error()
 
 		return m
 	}
+
 	m.resp.Success = true
 	m.resp.Message = "Cpu has been retrieved"
-	m.resp.Data = Cpu
+	m.resp.Data = CPU
 
 	return m
 }
 
-// GetCpuAvg returns cpu usage statistics.
-func (m *Methods) GetCpuAvg() *Methods {
-	CpuUsage, err := internal.GetAvg()
+// GetCPUAvg returns cpu usage statistics.
+func (m *Methods) GetCPUAvg() *Methods {
+	CPUUsage, err := internal.GetAvg()
 	if err != nil {
 		m.resp.Success = false
 		m.resp.Message = err.Error()
 
 		return m
 	}
+
 	m.resp.Success = true
 	m.resp.Message = "Cpu average has been retrieved"
-	m.resp.Data = CpuUsage
+	m.resp.Data = CPUUsage
 
 	return m
 }
 
-// GetCpuTimes returns cpu usage statistics.
-func (m *Methods) GetCpuTimes() *Methods {
-	CpuUsage, err := internal.GetCpuTimes()
+// GetCPUTimes GetCpuTimes returns cpu usage statistics.
+func (m *Methods) GetCPUTimes() *Methods {
+	CPUUsage, err := internal.GetCPUTimes()
 	if err != nil {
 		m.resp.Success = false
 		m.resp.Message = err.Error()
 
 		return m
 	}
+
 	m.resp.Success = true
 	m.resp.Message = "Cpu average has been retrieved"
-	m.resp.Data = CpuUsage
+	m.resp.Data = CPUUsage
 
 	return m
 }
@@ -96,6 +100,7 @@ func (m *Methods) GetSettings() *Methods {
 
 		return m
 	}
+
 	m.resp.Success = true
 	m.resp.Message = "Settings has been retrieved"
 	m.resp.Data = settings
@@ -103,7 +108,7 @@ func (m *Methods) GetSettings() *Methods {
 	return m
 }
 
-//UpdateSettings updates settings
+// UpdateSettings updates settings
 func (m *Methods) UpdateSettings(settings structures.PanelSettings) *Methods {
 	err := m.db.UpdateSettings(settings)
 	if err != nil {
@@ -112,6 +117,7 @@ func (m *Methods) UpdateSettings(settings structures.PanelSettings) *Methods {
 
 		return m
 	}
+
 	m.resp.Success = true
 	m.resp.Message = "Settings has been updated"
 

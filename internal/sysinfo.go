@@ -6,22 +6,22 @@ import (
 	"github.com/shirou/gopsutil/v3/mem"
 )
 
-//GetVirtualMemory returns virtual memory info
+// GetVirtualMemory returns virtual memory info
 func GetVirtualMemory() (*mem.VirtualMemoryStat, error) {
 	return mem.VirtualMemory()
 }
 
-//GetCpuInfo returns cpu info
-func GetCpuInfo() ([]cpu.InfoStat, error) {
+// GetCPUInfo returns cpu info
+func GetCPUInfo() ([]cpu.InfoStat, error) {
 	return cpu.Info()
 }
 
-//GetAvg returns cpu load
+// GetAvg returns cpu load
 func GetAvg() (*load.AvgStat, error) {
 	return load.Avg()
 }
 
-//GetCpuTimes returns cpu times
-func GetCpuTimes() ([]cpu.TimesStat, error) {
+// GetCPUTimes GetCpuTimes returns cpu times
+func GetCPUTimes() ([]cpu.TimesStat, error) {
 	return cpu.Times(true)
 }

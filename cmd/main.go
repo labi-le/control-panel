@@ -19,8 +19,8 @@ func init() {
 
 func main() {
 	flag.Parse()
-	Config := structures.Config{}
 
+	Config := structures.Config{}
 	_, err := toml.DecodeFile(config, &Config)
 
 	if err != nil {

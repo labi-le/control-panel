@@ -68,7 +68,6 @@ func (s *Server) route() {
 	s.router.HandleFunc("/api/settings", s.apiSettingsResolver).Methods(http.MethodPut, http.MethodPost)
 	// api info
 	s.router.HandleFunc("/api/{hardware}/{method}", s.hardwareInfoResolver).Methods(http.MethodPost)
-
 }
 
 func (s *Server) logRequestMiddleware(next http.Handler) http.Handler {
@@ -96,7 +95,7 @@ func (s *Server) logRequestMiddleware(next http.Handler) http.Handler {
 			"completed with %d %s in %v",
 			rw.code,
 			http.StatusText(rw.code),
-			time.Now().Sub(start),
+			time.Since(start),
 		)
 	})
 }
@@ -138,26 +137,20 @@ func (s *Server) hardwareInfoResolver(w http.ResponseWriter, r *http.Request) {
 	case "cpu":
 		switch methodName {
 		case "info":
-			ResponseMethod(method.GetCpuInfo())
-			break
+			ResponseMethod(method.GetCPUInfo())
 
 		case "load":
-			ResponseMethod(method.GetCpuAvg())
-			break
+			ResponseMethod(method.GetCPUAvg())
 
 		case "times":
-			ResponseMethod(method.GetCpuTimes())
-			break
+			ResponseMethod(method.GetCPUTimes())
 		}
-		break
 
 	case "mem":
 		ResponseMethod(method.GetVirtualMemory())
-		break
 
 	default:
 		ResponseMethod(method.MethodNotFound())
-		break
 	}
 }
 
@@ -165,15 +158,12 @@ func Response(response structures.Response, w http.ResponseWriter) {
 	switch response.Success {
 	case false:
 		w.WriteHeader(http.StatusBadRequest)
-		break
 
 	case true:
 		w.WriteHeader(http.StatusOK)
-		break
 	}
 
 	_ = json.NewEncoder(w).Encode(response)
-	return
 }
 
 func ResponseMethod(m *Methods) {
