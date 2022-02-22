@@ -25,10 +25,11 @@ func (conn *DB) Migrate() error {
 }
 
 // GetSettings returns the settings
+// if the settings are not found, it will save and return default settings
 func (conn *DB) GetSettings() (*structures.PanelSettings, error) {
 	var settings structures.PanelSettings
-	if err := conn.db.First(&settings).Error; err != nil {
-		return nil, err
+	if err := conn.db.FirstOrCreate(&settings).Error; err != nil {
+		return structures.DefaultPanelSettings(), nil
 	}
 
 	return &settings, nil
@@ -36,5 +37,5 @@ func (conn *DB) GetSettings() (*structures.PanelSettings, error) {
 
 // UpdateSettings updates the settings
 func (conn *DB) UpdateSettings(settings structures.PanelSettings) error {
-	return conn.db.Save(&settings).Error
+	return conn.db.Model(&settings).Where("_rowid_ = ?", 1).Updates(&settings).Error
 }

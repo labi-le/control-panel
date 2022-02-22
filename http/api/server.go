@@ -6,6 +6,7 @@ import (
 	"github.com/labi-le/control-panel/internal"
 	"github.com/labi-le/control-panel/structures"
 	"github.com/sirupsen/logrus"
+	"io/ioutil"
 	"net/http"
 	"time"
 )
@@ -108,53 +109,21 @@ func (s *Server) apiInfoResolver(w http.ResponseWriter, r *http.Request) {
 	//body, _ := ioutil.ReadAll(r.Body)
 
 	params := mux.Vars(r)
-	method := params["method"]
+	methodName := params["method"]
 
-	resp := structures.Response{
-		Version: "0.1",
-		Time:    time.Now(),
-	}
+	method := NewMethods(w, s.DB)
 
-	switch method {
+	switch methodName {
 	case "settings":
-		Settings, err := s.DB.GetSettings()
-		if err != nil {
-			resp.Success = false
-			resp.Message = err.Error()
-
-			response(resp, w)
-			break
-		}
-
-		resp.Success = true
-		resp.Message = "Settings has been retrieved"
-		resp.Data = Settings
-
-		response(resp, w)
+		ResponseMethod(method.GetSettings())
 		break
 
 	case "mem":
-		Mem, err := internal.GetVirtualMemory()
-		if err != nil {
-			resp.Success = false
-			resp.Message = err.Error()
-
-			response(resp, w)
-			break
-		}
-
-		resp.Success = true
-		resp.Message = "Mem has been retrieved"
-		resp.Data = Mem
-
-		response(resp, w)
+		ResponseMethod(method.GetVirtualMemory())
 		break
 
 	default:
-		resp.Success = false
-		resp.Message = "Method not found"
-
-		response(resp, w)
+		ResponseMethod(method.MethodNotFound())
 		break
 	}
 
@@ -164,31 +133,31 @@ func (s *Server) apiChangeResolver(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	//var Item http.Response
-	//body, _ := ioutil.ReadAll(r.Body)
+	body, _ := ioutil.ReadAll(r.Body)
 
 	params := mux.Vars(r)
-	method := params["method"]
+	methodName := params["method"]
 
-	resp := structures.Response{
-		Version: "0.1",
-		Time:    time.Now(),
-	}
+	method := NewMethods(w, s.DB)
 
-	switch method {
+	switch methodName {
 	case "settings":
-		//todo
+		var settings structures.PanelSettings
+		err := json.Unmarshal(body, &settings)
+		if err != nil {
+			ResponseMethod(method.BadRequest(err))
+			return
+		}
+		ResponseMethod(method.UpdateSettings(settings))
 		break
 	default:
-		resp.Success = false
-		resp.Message = "Method not found"
-
-		response(resp, w)
+		ResponseMethod(method.MethodNotFound())
 		break
 	}
 
 }
 
-func response(response structures.Response, w http.ResponseWriter) {
+func Response(response structures.Response, w http.ResponseWriter) {
 	switch response.Success {
 	case false:
 		w.WriteHeader(http.StatusBadRequest)
@@ -201,4 +170,8 @@ func response(response structures.Response, w http.ResponseWriter) {
 
 	_ = json.NewEncoder(w).Encode(response)
 	return
+}
+
+func ResponseMethod(m *Methods) {
+	Response(m.resp, m.w)
 }

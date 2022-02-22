@@ -1,5 +1,9 @@
-POST localhost:7000/api/mem
+POST localhost:7000/api/settings
 Content-Type: application/json
 
+# settings panel fields
 {
+  "port": "7777",
+  "language": "en",
+  "theme": "default"
 }
