@@ -64,11 +64,10 @@ func (s *Server) configureLogger() {
 func (s *Server) route() {
 	s.router.Use(s.logRequestMiddleware)
 
-	// api info
-	s.router.HandleFunc("/api/{method}", s.apiInfoResolver).Methods(http.MethodPost)
-
 	// api put data
-	s.router.HandleFunc("/api/{method}", s.apiChangeResolver).Methods(http.MethodPut)
+	s.router.HandleFunc("/api/settings", s.apiSettingsResolver).Methods(http.MethodPut, http.MethodPost)
+	// api info
+	s.router.HandleFunc("/api/{hardware}/{method}", s.hardwareInfoResolver).Methods(http.MethodPost)
 
 }
 
@@ -102,20 +101,54 @@ func (s *Server) logRequestMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-func (s *Server) apiInfoResolver(w http.ResponseWriter, r *http.Request) {
+func (s *Server) apiSettingsResolver(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	//var Item http.Response
-	//body, _ := ioutil.ReadAll(r.Body)
+	method := NewMethods(w, s.DB)
+
+	if r.Method == http.MethodPost {
+		ResponseMethod(method.GetSettings())
+		return
+	} else if r.Method == http.MethodPut {
+		var settings structures.PanelSettings
+
+		body, _ := ioutil.ReadAll(r.Body)
+		err := json.Unmarshal(body, &settings)
+		if err != nil {
+			ResponseMethod(method.BadRequest(err))
+			return
+		}
+		ResponseMethod(method.UpdateSettings(settings))
+		return
+	}
+
+	ResponseMethod(method.MethodNotFound())
+}
+
+func (s *Server) hardwareInfoResolver(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 
 	params := mux.Vars(r)
+	hardware := params["hardware"]
 	methodName := params["method"]
 
 	method := NewMethods(w, s.DB)
 
-	switch methodName {
-	case "settings":
-		ResponseMethod(method.GetSettings())
+	switch hardware {
+	case "cpu":
+		switch methodName {
+		case "info":
+			ResponseMethod(method.GetCpuInfo())
+			break
+
+		case "load":
+			ResponseMethod(method.GetCpuAvg())
+			break
+
+		case "times":
+			ResponseMethod(method.GetCpuTimes())
+			break
+		}
 		break
 
 	case "mem":
@@ -126,35 +159,6 @@ func (s *Server) apiInfoResolver(w http.ResponseWriter, r *http.Request) {
 		ResponseMethod(method.MethodNotFound())
 		break
 	}
-
-}
-
-func (s *Server) apiChangeResolver(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
-	//var Item http.Response
-	body, _ := ioutil.ReadAll(r.Body)
-
-	params := mux.Vars(r)
-	methodName := params["method"]
-
-	method := NewMethods(w, s.DB)
-
-	switch methodName {
-	case "settings":
-		var settings structures.PanelSettings
-		err := json.Unmarshal(body, &settings)
-		if err != nil {
-			ResponseMethod(method.BadRequest(err))
-			return
-		}
-		ResponseMethod(method.UpdateSettings(settings))
-		break
-	default:
-		ResponseMethod(method.MethodNotFound())
-		break
-	}
-
 }
 
 func Response(response structures.Response, w http.ResponseWriter) {
