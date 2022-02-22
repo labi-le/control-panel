@@ -38,12 +38,52 @@ func (m *Methods) GetVirtualMemory() *Methods {
 	m.resp.Data = Mem
 
 	return m
-
 }
 
-func (m *Methods) MethodNotFound() *Methods {
-	m.resp.Success = false
-	m.resp.Message = "Method not found"
+// GetCpuInfo returns cpu statistics.
+func (m *Methods) GetCpuInfo() *Methods {
+	Cpu, err := internal.GetCpuInfo()
+	if err != nil {
+		m.resp.Success = false
+		m.resp.Message = err.Error()
+
+		return m
+	}
+	m.resp.Success = true
+	m.resp.Message = "Cpu has been retrieved"
+	m.resp.Data = Cpu
+
+	return m
+}
+
+// GetCpuAvg returns cpu usage statistics.
+func (m *Methods) GetCpuAvg() *Methods {
+	CpuUsage, err := internal.GetAvg()
+	if err != nil {
+		m.resp.Success = false
+		m.resp.Message = err.Error()
+
+		return m
+	}
+	m.resp.Success = true
+	m.resp.Message = "Cpu average has been retrieved"
+	m.resp.Data = CpuUsage
+
+	return m
+}
+
+// GetCpuTimes returns cpu usage statistics.
+func (m *Methods) GetCpuTimes() *Methods {
+	CpuUsage, err := internal.GetCpuTimes()
+	if err != nil {
+		m.resp.Success = false
+		m.resp.Message = err.Error()
+
+		return m
+	}
+	m.resp.Success = true
+	m.resp.Message = "Cpu average has been retrieved"
+	m.resp.Data = CpuUsage
 
 	return m
 }
@@ -81,6 +121,13 @@ func (m *Methods) UpdateSettings(settings structures.PanelSettings) *Methods {
 func (m *Methods) BadRequest(err error) *Methods {
 	m.resp.Success = false
 	m.resp.Message = err.Error()
+
+	return m
+}
+
+func (m *Methods) MethodNotFound() *Methods {
+	m.resp.Success = false
+	m.resp.Message = "Method not found"
 
 	return m
 }
