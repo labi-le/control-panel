@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"github.com/BurntSushi/toml"
-	web "github.com/labi-le/control-panel/http"
+	"github.com/labi-le/control-panel/http/api"
 	"github.com/labi-le/control-panel/internal"
 	"github.com/labi-le/control-panel/structures"
 	"log"
@@ -27,14 +27,16 @@ func main() {
 		log.Fatal(err)
 	}
 
-	db := internal.NewDB(Config)
-	Config.DB = db
+	server := api.Server{
+		Config: &Config,
+		DB:     internal.NewDB(&Config),
+	}
 
-	if db.Migrate() != nil {
+	if server.DB.Migrate() != nil {
 		log.Fatal(err)
 	}
 
-	err = web.Start(&Config)
+	err = api.Start(&server)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -1,4 +1,4 @@
-package web
+package api
 
 import (
 	"encoding/json"
@@ -15,6 +15,7 @@ type Server struct {
 	logger *logrus.Logger
 
 	Config *structures.Config
+	DB     *internal.DB
 }
 
 // implement
@@ -22,12 +23,13 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.router.ServeHTTP(w, r)
 }
 
-func newServer(config *structures.Config) *Server {
+func newServer(srv *Server) *Server {
 	s := &Server{
 		router: mux.NewRouter(),
 		logger: logrus.New(),
 
-		Config: config,
+		DB:     internal.NewDB(srv.Config),
+		Config: srv.Config,
 	}
 
 	s.route()
@@ -35,15 +37,15 @@ func newServer(config *structures.Config) *Server {
 	return s
 }
 
-func Start(config *structures.Config) error {
-	srv := newServer(config)
+func Start(s *Server) error {
+	srv := newServer(s)
 	srv.configureLogger()
 
 	srv.logger.Log(logrus.InfoLevel, "Rest api started")
 
 	server := &http.Server{
 		Handler: srv,
-		Addr:    config.Addr,
+		Addr:    s.Config.Addr,
 	}
 
 	return server.ListenAndServe()
@@ -115,7 +117,7 @@ func (s *Server) apiInfoResolver(w http.ResponseWriter, r *http.Request) {
 
 	switch method {
 	case "settings":
-		Settings, err := s.Config.DB.GetSettings()
+		Settings, err := s.DB.GetSettings()
 		if err != nil {
 			resp.Success = false
 			resp.Message = err.Error()

@@ -10,7 +10,7 @@ type DB struct {
 	db *gorm.DB
 }
 
-func NewDB(c structures.Config) *DB {
+func NewDB(c *structures.Config) *DB {
 	conn, err := gorm.Open(sqlite.Open(c.Dsn), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database")
