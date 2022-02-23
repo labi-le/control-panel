@@ -57,7 +57,6 @@ func (s *Server) configureLogger() {
 	if err != nil {
 		panic("invalid log level")
 	}
-
 	s.logger.SetLevel(level)
 }
 
@@ -133,25 +132,30 @@ func (s *Server) hardwareInfoResolver(w http.ResponseWriter, r *http.Request) {
 
 	method := NewMethods(w, s.DB)
 
-	switch hardware {
-	case "cpu":
-		switch methodName {
-		case "info":
-			ResponseMethod(method.GetCPUInfo())
+	methodResponse := func() *Methods {
+		switch hardware {
+		case "cpu":
+			switch methodName {
+			case "info":
+				return method.GetCPUInfo()
 
-		case "load":
-			ResponseMethod(method.GetCPUAvg())
+			case "load":
+				return method.GetCPUAvg()
 
-		case "times":
-			ResponseMethod(method.GetCPUTimes())
+			case "times":
+				return method.GetCPUTimes()
+			}
+
+		case "memory":
+			if methodName == "info" {
+				return method.GetVirtualMemory()
+			}
 		}
 
-	case "mem":
-		ResponseMethod(method.GetVirtualMemory())
-
-	default:
-		ResponseMethod(method.MethodNotFound())
+		return method.MethodNotFound()
 	}
+
+	ResponseMethod(methodResponse())
 }
 
 func Response(response structures.Response, w http.ResponseWriter) {

@@ -1,4 +1,4 @@
-POST localhost:7000/api/settings
+POST localhost:7000/api/mem/a
 Content-Type: application/json
 
 # settings panel fields

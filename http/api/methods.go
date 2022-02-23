@@ -28,77 +28,46 @@ func NewMethods(w http.ResponseWriter, db *internal.DB) *Methods {
 func (m *Methods) GetVirtualMemory() *Methods {
 	Mem, err := internal.GetVirtualMemory()
 	if err != nil {
-		m.resp.Success = false
-		m.resp.Message = err.Error()
-
-		return m
+		return m.BadRequest(err)
 	}
 
-	m.resp.Success = true
-	m.resp.Message = "Mem has been retrieved"
-	m.resp.Data = Mem
-
-	return m
+	return m.SuccessResponse("Mem has been retrieved", Mem)
 }
 
 // GetCPUInfo returns cpu statistics.
 func (m *Methods) GetCPUInfo() *Methods {
-	CPU, err := internal.GetCPUInfo()
+	CPUInfo, err := internal.GetCPUInfo()
 	if err != nil {
-		m.resp.Success = false
-		m.resp.Message = err.Error()
-
-		return m
+		return m.BadRequest(err)
 	}
 
-	m.resp.Success = true
-	m.resp.Message = "Cpu has been retrieved"
-	m.resp.Data = CPU
-
-	return m
+	return m.SuccessResponse("Cpu info has been retrieved", CPUInfo)
 }
 
 // GetCPUAvg returns cpu usage statistics.
 func (m *Methods) GetCPUAvg() *Methods {
 	CPUUsage, err := internal.GetAvg()
 	if err != nil {
-		m.resp.Success = false
-		m.resp.Message = err.Error()
-
-		return m
+		return m.BadRequest(err)
 	}
 
-	m.resp.Success = true
-	m.resp.Message = "Cpu average has been retrieved"
-	m.resp.Data = CPUUsage
-
-	return m
+	return m.SuccessResponse("Cpu average has been retrieved", CPUUsage)
 }
 
 // GetCPUTimes GetCpuTimes returns cpu usage statistics.
 func (m *Methods) GetCPUTimes() *Methods {
-	CPUUsage, err := internal.GetCPUTimes()
+	CPUTimes, err := internal.GetCPUTimes()
 	if err != nil {
-		m.resp.Success = false
-		m.resp.Message = err.Error()
-
-		return m
+		return m.BadRequest(err)
 	}
 
-	m.resp.Success = true
-	m.resp.Message = "Cpu average has been retrieved"
-	m.resp.Data = CPUUsage
-
-	return m
+	return m.SuccessResponse("Cpu times has been retrieved", CPUTimes)
 }
 
 func (m *Methods) GetSettings() *Methods {
 	settings, err := m.db.GetSettings()
 	if err != nil {
-		m.resp.Success = false
-		m.resp.Message = err.Error()
-
-		return m
+		return m.BadRequest(err)
 	}
 
 	m.resp.Success = true
@@ -112,14 +81,16 @@ func (m *Methods) GetSettings() *Methods {
 func (m *Methods) UpdateSettings(settings structures.PanelSettings) *Methods {
 	err := m.db.UpdateSettings(settings)
 	if err != nil {
-		m.resp.Success = false
-		m.resp.Message = err.Error()
-
-		return m
+		return m.BadRequest(err)
 	}
 
+	return m.SuccessResponse("Settings has been updated", []string{})
+}
+
+func (m *Methods) SuccessResponse(msg string, data interface{}) *Methods {
 	m.resp.Success = true
-	m.resp.Message = "Settings has been updated"
+	m.resp.Message = msg
+	m.resp.Data = data
 
 	return m
 }
