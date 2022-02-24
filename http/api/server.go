@@ -142,7 +142,7 @@ func (s *Server) hardwareInfoResolver(w http.ResponseWriter, r *http.Request) {
 				return method.GetCPUInfo()
 
 			case "load":
-				return method.GetCPUAvg()
+				return method.GetCPULoad()
 
 			case "times":
 				return method.GetCPUTimes()

@@ -39,9 +39,9 @@ func (m *Methods) GetCPUInfo() *Methods {
 	return m.SuccessResponse("Cpu info has been retrieved", CPUInfo)
 }
 
-// GetCPUAvg returns cpu usage statistics.
-func (m *Methods) GetCPUAvg() *Methods {
-	CPUUsage, err := internal.GetAvg()
+// GetCPULoad returns cpu usage statistics.
+func (m *Methods) GetCPULoad() *Methods {
+	CPUUsage, err := internal.GetCPULoad()
 	if err != nil {
 		return m.BadRequest(err)
 	}

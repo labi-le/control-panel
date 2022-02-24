@@ -3,7 +3,6 @@ package internal
 import (
 	"github.com/pbnjay/memory"
 	"github.com/shirou/gopsutil/v3/cpu"
-	"github.com/shirou/gopsutil/v3/load"
 )
 
 // Memory in kibibyte
@@ -25,9 +24,18 @@ func GetCPUInfo() ([]cpu.InfoStat, error) {
 	return cpu.Info()
 }
 
-// GetAvg returns cpu load
-func GetAvg() (*load.AvgStat, error) {
-	return load.Avg()
+type CPULoad struct {
+	Load []float64 `json:"load"`
+}
+
+// GetCPULoad returns cpu load
+func GetCPULoad() (*CPULoad, error) {
+	percent, err := cpu.Percent(0, true)
+	if err != nil {
+		return nil, err
+	}
+
+	return &CPULoad{Load: percent}, nil
 }
 
 // GetCPUTimes GetCpuTimes returns cpu times
