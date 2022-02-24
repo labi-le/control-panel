@@ -63,6 +63,8 @@ func (s *Server) configureLogger() {
 func (s *Server) route() {
 	s.router.Use(s.logRequestMiddleware)
 
+	//web interface
+	s.router.HandleFunc("/", s.webInterface).Methods("GET")
 	// api put data
 	s.router.HandleFunc("/api/settings", s.apiSettingsResolver).Methods(http.MethodPut, http.MethodPost)
 	// api info
@@ -171,6 +173,10 @@ func (s *Server) hardwareInfoResolver(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ResponseMethod(methodResponse())
+}
+
+func (s *Server) webInterface(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "./frontend/index.html")
 }
 
 func Response(response structures.Response, w http.ResponseWriter) {
