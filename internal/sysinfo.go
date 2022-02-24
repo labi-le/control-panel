@@ -25,17 +25,17 @@ func GetCPUInfo() ([]cpu.InfoStat, error) {
 }
 
 type CPULoad struct {
-	Load []float64 `json:"load"`
+	Load float64 `json:"load"`
 }
 
 // GetCPULoad returns cpu load
 func GetCPULoad() (*CPULoad, error) {
-	percent, err := cpu.Percent(0, true)
+	percent, err := cpu.Percent(0, false)
 	if err != nil {
 		return nil, err
 	}
 
-	return &CPULoad{Load: percent}, nil
+	return &CPULoad{Load: percent[0]}, nil
 }
 
 // GetCPUTimes GetCpuTimes returns cpu times
