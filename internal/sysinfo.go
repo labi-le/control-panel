@@ -1,14 +1,23 @@
 package internal
 
 import (
+	"github.com/pbnjay/memory"
 	"github.com/shirou/gopsutil/v3/cpu"
 	"github.com/shirou/gopsutil/v3/load"
-	"github.com/shirou/gopsutil/v3/mem"
 )
 
+// Memory in kibibyte
+type Memory struct {
+	Total uint64 `json:"total"`
+	Free  uint64 `json:"free"`
+}
+
 // GetVirtualMemory returns virtual memory info
-func GetVirtualMemory() (*mem.VirtualMemoryStat, error) {
-	return mem.VirtualMemory()
+func GetVirtualMemory() *Memory {
+	return &Memory{
+		Total: memory.TotalMemory(),
+		Free:  memory.FreeMemory(),
+	}
 }
 
 // GetCPUInfo returns cpu info

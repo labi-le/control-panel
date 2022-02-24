@@ -26,12 +26,7 @@ func NewMethods(w http.ResponseWriter, db *internal.DB) *Methods {
 
 // GetVirtualMemory returns virtual memory statistics.
 func (m *Methods) GetVirtualMemory() *Methods {
-	Mem, err := internal.GetVirtualMemory()
-	if err != nil {
-		return m.BadRequest(err)
-	}
-
-	return m.SuccessResponse("Mem has been retrieved", Mem)
+	return m.SuccessResponse("Mem has been retrieved", internal.GetVirtualMemory())
 }
 
 // GetCPUInfo returns cpu statistics.
