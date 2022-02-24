@@ -176,6 +176,9 @@ func (s *Server) hardwareInfoResolver(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) webInterface(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
 	http.ServeFile(w, r, "./frontend/index.html")
 }
 
