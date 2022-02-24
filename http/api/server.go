@@ -154,9 +154,17 @@ func (s *Server) hardwareInfoResolver(w http.ResponseWriter, r *http.Request) {
 			}
 
 		case "disk":
-			if methodName == "io" {
+			switch methodName {
+			case "info":
+				return method.GetDiskInfo(params["path"])
+
+			case "io":
 				return method.GetDiskIO()
+
+			case "partitions":
+				return method.GetDiskPartitions()
 			}
+
 		}
 
 		return method.MethodNotFound()

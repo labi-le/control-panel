@@ -1,9 +1,10 @@
 package internal
 
 import (
-	"github.com/mackerelio/go-osstat/disk"
+	io "github.com/mackerelio/go-osstat/disk"
 	"github.com/pbnjay/memory"
 	"github.com/shirou/gopsutil/v3/cpu"
+	"github.com/shirou/gopsutil/v3/disk"
 )
 
 // Memory in kibibyte
@@ -40,8 +41,18 @@ func GetCPULoad() (*CPULoad, error) {
 }
 
 // GetDiskIO returns disk usage
-func GetDiskIO() ([]disk.Stats, error) {
-	return disk.Get()
+func GetDiskIO() ([]io.Stats, error) {
+	return io.Get()
+}
+
+// GetDiskPartitions returns disk partitions
+func GetDiskPartitions() ([]disk.PartitionStat, error) {
+	return disk.Partitions(true)
+}
+
+// GetDiskInfo returns disk info
+func GetDiskInfo(path string) (*disk.UsageStat, error) {
+	return disk.Usage(path)
 }
 
 // GetCPUTimes GetCpuTimes returns cpu times

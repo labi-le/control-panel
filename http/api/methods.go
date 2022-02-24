@@ -59,6 +59,26 @@ func (m *Methods) GetDiskIO() *Methods {
 	return m.SuccessResponse("Disk usage has been retrieved", DiskUsage)
 }
 
+// GetDiskPartitions returns disk partitions.
+func (m *Methods) GetDiskPartitions() *Methods {
+	DiskPartitions, err := internal.GetDiskPartitions()
+	if err != nil {
+		return m.BadRequest(err)
+	}
+
+	return m.SuccessResponse("Disk partitions has been retrieved", DiskPartitions)
+}
+
+// GetDiskInfo returns disk usage statistics.
+func (m *Methods) GetDiskInfo(path string) *Methods {
+	DiskUsage, err := internal.GetDiskInfo(path)
+	if err != nil {
+		return m.BadRequest(err)
+	}
+
+	return m.SuccessResponse("Disk usage has been retrieved", DiskUsage)
+}
+
 // GetCPUTimes GetCpuTimes returns cpu usage statistics.
 func (m *Methods) GetCPUTimes() *Methods {
 	CPUTimes, err := internal.GetCPUTimes()
