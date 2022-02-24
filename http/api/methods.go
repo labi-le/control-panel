@@ -49,6 +49,16 @@ func (m *Methods) GetCPULoad() *Methods {
 	return m.SuccessResponse("Cpu average has been retrieved", CPUUsage)
 }
 
+// GetDiskIO returns disk usage statistics.
+func (m *Methods) GetDiskIO() *Methods {
+	DiskUsage, err := internal.GetDiskIO()
+	if err != nil {
+		return m.BadRequest(err)
+	}
+
+	return m.SuccessResponse("Disk usage has been retrieved", DiskUsage)
+}
+
 // GetCPUTimes GetCpuTimes returns cpu usage statistics.
 func (m *Methods) GetCPUTimes() *Methods {
 	CPUTimes, err := internal.GetCPUTimes()

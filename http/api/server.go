@@ -152,6 +152,11 @@ func (s *Server) hardwareInfoResolver(w http.ResponseWriter, r *http.Request) {
 			if methodName == "info" {
 				return method.GetVirtualMemory()
 			}
+
+		case "disk":
+			if methodName == "io" {
+				return method.GetDiskIO()
+			}
 		}
 
 		return method.MethodNotFound()

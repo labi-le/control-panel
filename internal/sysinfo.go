@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"github.com/mackerelio/go-osstat/disk"
 	"github.com/pbnjay/memory"
 	"github.com/shirou/gopsutil/v3/cpu"
 )
@@ -36,6 +37,11 @@ func GetCPULoad() (*CPULoad, error) {
 	}
 
 	return &CPULoad{Load: percent[0]}, nil
+}
+
+// GetDiskIO returns disk usage
+func GetDiskIO() ([]disk.Stats, error) {
+	return disk.Get()
 }
 
 // GetCPUTimes GetCpuTimes returns cpu times
