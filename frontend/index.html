@@ -2,35 +2,39 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Control Panel</title>
+    <title>Панель управления</title>
     <link href="index.css" rel="stylesheet">
 </head>
 <body onload="updateStatistics()">
-<div class="header">control panel</div>
+<div class="header">Панель управления</div>
 <div class="wrapper">
     <div class="left-panel">
-        <div class="left-panel-category">first category</div>
-        <div class="left-panel-category">second category</div>
-        <div class="left-panel-category">third category</div>
-        <div class="left-panel-category">fourth category</div>
-        <div class="left-panel-category">fifth category</div>
+        <div class="left-panel-category">Состояние сервера</div>
+        <div class="left-panel-category">Управление доменами</div>
+        <div class="left-panel-category">Управление почтой</div>
+        <div class="left-panel-category">Управление базами данных</div>
+        <div class="left-panel-category">Общие настройки</div>
     </div>
     <div class="content">
         <div class="inner-block total-memory">
-            <div class="usage-memory" id="usage-memory-text">Usage memory</div>
-            <div class="usage-memory" id="usage-memory-size"></div>
+            <div id="total-memory-text">Всего памяти</div>
+            <div id="total-memory-size"></div>
+        </div>
+        <div class="inner-block usage-memory">
+            <div id="usage-memory-text">Использование памяти</div>
+            <div id="usage-memory-size"></div>
         </div>
         <div class="inner-block available-memory">
-            <div class="available-memory" id="available-memory-text">Available memory</div>
-            <div class="available-memory" id="available-memory-size"></div>
+            <div id="available-memory-text">Доступно памяти</div>
+            <div id="available-memory-size"></div>
         </div>
         <div class="inner-block cpu-load">
-            <div class="cpu-load" id="cpu-load-text">CPU load (avg.)</div>
-            <div class="cpu-load" id="cpu-load-size"></div>
+            <div id="cpu-load-text">Нагрузка процессора</div>
+            <div id="cpu-load-size"></div>
         </div>
     </div>
 </div>
-<div class="footer">v0.1</div>
+<div class="footer" id="footer-version"></div>
 </body>
 <script src="index.js"></script>
 <script src="globalFunctions.js"></script>
