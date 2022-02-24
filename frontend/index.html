@@ -5,21 +5,33 @@
     <title>Control Panel</title>
     <link href="index.css" rel="stylesheet">
 </head>
-<body>
+<body onload="updateStatistics()">
+<div class="header">control panel</div>
 <div class="wrapper">
-    <div class="inner-block total-memory">
-        <div class="usage-memory" id="usage-memory-text">Usage memory</div>
-        <div class="usage-memory" id="usage-memory-size">4 GB</div>
+    <div class="left-panel">
+        <div class="left-panel-category">first category</div>
+        <div class="left-panel-category">second category</div>
+        <div class="left-panel-category">third category</div>
+        <div class="left-panel-category">fourth category</div>
+        <div class="left-panel-category">fifth category</div>
     </div>
-    <div class="inner-block available-memory">
-        <div class="available-memory" id="available-memory-text">Available memory</div>
-        <div class="available-memory" id="available-memory-size">2.7 GB</div>
-    </div>
-    <div class="inner-block cpu-load">
-        <div class="cpu-load" id="cpu-load-text">CPU load (avg.)</div>
-        <div class="cpu-load" id="cpu-load-size">3%</div>
+    <div class="content">
+        <div class="inner-block total-memory">
+            <div class="usage-memory" id="usage-memory-text">Usage memory</div>
+            <div class="usage-memory" id="usage-memory-size"></div>
+        </div>
+        <div class="inner-block available-memory">
+            <div class="available-memory" id="available-memory-text">Available memory</div>
+            <div class="available-memory" id="available-memory-size"></div>
+        </div>
+        <div class="inner-block cpu-load">
+            <div class="cpu-load" id="cpu-load-text">CPU load (avg.)</div>
+            <div class="cpu-load" id="cpu-load-size"></div>
+        </div>
     </div>
 </div>
+<div class="footer">v0.1</div>
 </body>
 <script src="index.js"></script>
+<script src="globalFunctions.js"></script>
 </html>
