@@ -45,7 +45,6 @@ func Start(s *Server) error {
 		Addr:    srv.Config.Addr,
 	}
 
-	println("Server started at " + srv.Config.Addr)
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},
 		AllowCredentials: true,
