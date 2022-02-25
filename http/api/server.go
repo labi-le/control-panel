@@ -26,33 +26,28 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.router.ServeHTTP(w, r)
 }
 
-func newServer(srv *Server) *Server {
-	s := &Server{
+func Start(s *Server) error {
+	srv := &Server{
 		router: mux.NewRouter(),
 		logger: logrus.New(),
 
-		DB:     internal.NewDB(srv.Config),
-		Config: srv.Config,
+		DB:     internal.NewDB(s.Config),
+		Config: s.Config,
 	}
 
-	s.route()
+	srv.route()
 
-	return s
-}
-
-func Start(s *Server) error {
-	srv := newServer(s)
 	srv.configureLogger()
 
 	srv.logger.Log(logrus.InfoLevel, "Rest api started")
 
 	server := &http.Server{
 		Handler: srv,
-		Addr:    s.Config.Addr,
+		Addr:    srv.Config.Addr,
 	}
 
 	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{fmt.Sprintf("%s:%d", s.Config.Addr, s.Config.Port)},
+		AllowedOrigins:   []string{fmt.Sprintf("%srv:%d", srv.Config.Addr, srv.Config.Port)},
 		AllowCredentials: true,
 	})
 
@@ -73,7 +68,6 @@ func (s *Server) route() {
 	s.router.Use(s.logRequestMiddleware)
 
 	//web interface
-	//s.router.HandleFunc("/", s.webInterface).Methods("GET")
 	s.router.PathPrefix("/").Handler(http.FileServer(http.Dir("./frontend/"))).Methods(http.MethodGet)
 
 	// api put data
