@@ -1,7 +1,9 @@
 @import url(https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700&display=swap);
+
 html {
     height: 100%;
 }
+
 body {
     display: flex;
     flex-direction: column;
@@ -12,22 +14,26 @@ body {
     padding: 0;
     margin: 0;
 }
+
 div {
     font-family: system-ui;
     font-weight: bold;
     color: #FFFFFF;
 }
+
 .header {
     padding: 8px 0;
     background: #232323;
     text-align: center;
 }
+
 .wrapper {
     display: flex;
     flex-direction: row;
     flex: 1 0 auto;
     background: #FFFFFF;
 }
+
 .left-panel {
     display: flex;
     flex-direction: column;
@@ -35,15 +41,18 @@ div {
     padding: 4px 8px 0;
     white-space: nowrap;
 }
+
 .left-panel-category {
     padding: 4px 0 0;
 }
+
 .content {
     color: #FFFFFF;
     background: #202020;
     width: 100%;
     padding: 16px;
 }
+
 .inner-block {
     display: inline-block;
     background: #2f86f4;
@@ -53,6 +62,7 @@ div {
     font-family: system-ui;
     font-weight: bold;
 }
+
 .footer {
     padding: 8px 0;
     background: #232323;
@@ -69,7 +79,7 @@ div {
     width: 100%;
     height: 100%;
     z-index: 10;
-    background: rgba(0,0,0,0.8);
+    background: rgba(0, 0, 0, 0.8);
     opacity: 0;
     pointer-events: none;
 }
@@ -85,7 +95,7 @@ div {
     background: #252525;
     padding: 25px;
     min-width: 20%;
-    max-width: 90%;
+    max-width: 30%;
 }
 
 .window-header {
@@ -96,6 +106,13 @@ div {
 }
 
 .window-body {
+    margin-top: 4px;
+}
+
+/* текст в окне */
+.window-content {
+    display: flex;
+    flex-direction: column;
     margin-top: 4px;
 }
 
