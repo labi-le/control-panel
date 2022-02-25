@@ -5,6 +5,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/labi-le/control-panel/internal"
 	"github.com/labi-le/control-panel/structures"
+	"github.com/rs/cors"
 	"github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
@@ -24,30 +25,32 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.router.ServeHTTP(w, r)
 }
 
-func newServer(srv *Server) *Server {
-	s := &Server{
+func Start(s *Server) error {
+	srv := &Server{
 		router: mux.NewRouter(),
 		logger: logrus.New(),
 
-		DB:     internal.NewDB(srv.Config),
-		Config: srv.Config,
+		DB:     internal.NewDB(s.Config),
+		Config: s.Config,
 	}
 
-	s.route()
+	srv.route()
 
-	return s
-}
-
-func Start(s *Server) error {
-	srv := newServer(s)
 	srv.configureLogger()
 
 	srv.logger.Log(logrus.InfoLevel, "Rest api started")
 
 	server := &http.Server{
 		Handler: srv,
-		Addr:    s.Config.Addr,
+		Addr:    srv.Config.Addr,
 	}
+
+	c := cors.New(cors.Options{
+		AllowedOrigins:   []string{"*"},
+		AllowCredentials: true,
+	})
+
+	c.Handler(srv)
 
 	return server.ListenAndServe()
 }
@@ -64,7 +67,8 @@ func (s *Server) route() {
 	s.router.Use(s.logRequestMiddleware)
 
 	//web interface
-	s.router.HandleFunc("/", s.webInterface).Methods("GET")
+	s.router.PathPrefix("/").Handler(http.FileServer(http.Dir("./frontend/"))).Methods(http.MethodGet)
+
 	// api put data
 	s.router.HandleFunc("/api/settings", s.apiSettingsResolver).Methods(http.MethodPut, http.MethodPost)
 	// api info
@@ -173,13 +177,6 @@ func (s *Server) hardwareInfoResolver(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ResponseMethod(methodResponse())
-}
-
-func (s *Server) webInterface(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-
-	http.ServeFile(w, r, "./frontend/index.html")
 }
 
 func Response(response structures.Response, w http.ResponseWriter) {
