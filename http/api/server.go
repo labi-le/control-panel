@@ -2,9 +2,11 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/labi-le/control-panel/internal"
 	"github.com/labi-le/control-panel/structures"
+	"github.com/rs/cors"
 	"github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
@@ -49,6 +51,13 @@ func Start(s *Server) error {
 		Addr:    s.Config.Addr,
 	}
 
+	c := cors.New(cors.Options{
+		AllowedOrigins:   []string{fmt.Sprintf("%s:%d", s.Config.Addr, s.Config.Port)},
+		AllowCredentials: true,
+	})
+
+	c.Handler(srv)
+
 	return server.ListenAndServe()
 }
 
@@ -64,7 +73,9 @@ func (s *Server) route() {
 	s.router.Use(s.logRequestMiddleware)
 
 	//web interface
-	s.router.HandleFunc("/", s.webInterface).Methods("GET")
+	//s.router.HandleFunc("/", s.webInterface).Methods("GET")
+	s.router.PathPrefix("/").Handler(http.FileServer(http.Dir("./frontend/"))).Methods(http.MethodGet)
+
 	// api put data
 	s.router.HandleFunc("/api/settings", s.apiSettingsResolver).Methods(http.MethodPut, http.MethodPost)
 	// api info
@@ -173,13 +184,6 @@ func (s *Server) hardwareInfoResolver(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ResponseMethod(methodResponse())
-}
-
-func (s *Server) webInterface(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-
-	http.ServeFile(w, r, "./frontend/index.html")
 }
 
 func Response(response structures.Response, w http.ResponseWriter) {
