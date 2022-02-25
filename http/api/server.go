@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/labi-le/control-panel/internal"
 	"github.com/labi-le/control-panel/structures"
@@ -46,8 +45,9 @@ func Start(s *Server) error {
 		Addr:    srv.Config.Addr,
 	}
 
+	println("Server started at " + srv.Config.Addr)
 	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{fmt.Sprintf("%srv:%d", srv.Config.Addr, srv.Config.Port)},
+		AllowedOrigins:   []string{"*"},
 		AllowCredentials: true,
 	})
 
