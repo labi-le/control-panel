@@ -5,7 +5,7 @@
     <title>Панель управления</title>
     <link href="index.css" rel="stylesheet">
 </head>
-<body onload="updateStatistics()">
+<body class="body" onload="updateStatistics()">
 <div class="header">Панель управления</div>
 <div class="wrapper">
     <div class="left-panel">
@@ -14,6 +14,7 @@
         <div class="left-panel-category">Управление почтой</div>
         <div class="left-panel-category">Управление базами данных</div>
         <div class="left-panel-category">Общие настройки</div>
+        <div class="left-panel-category" onclick="showWindow('Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.')">Вызов тестового уведомления</div>
     </div>
     <div class="content">
         <div class="inner-block total-memory">
@@ -35,6 +36,17 @@
     </div>
 </div>
 <div class="footer" id="footer-version"></div>
+<div class="window-background">
+    <div class="window">
+        <div class="window-header">
+            <div class="window-title">Уведомление</div>
+            <div class="window-close" onclick="hideWindow()">Закрыть</div>
+        </div>
+        <div class="window-body">
+            <div class="window-content"></div>
+        </div>
+    </div>
+</div>
 </body>
 <script src="index.js"></script>
 <script src="globalFunctions.js"></script>

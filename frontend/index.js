@@ -3,6 +3,7 @@ setInterval(function() {
 }, 1500);
 function updateStatistics() {
     let requestMemoryInfo = new XMLHttpRequest();
+    let requestCPULoad = new XMLHttpRequest();
     requestMemoryInfo.open("POST", "http://localhost:7000/api/memory/info", true);
     requestMemoryInfo.onload = function () {
         let dataMemoryInfo = JSON.parse(requestMemoryInfo.responseText);
@@ -12,6 +13,11 @@ function updateStatistics() {
         // update api/panel version
         document.getElementById("footer-version").innerHTML = "v" + dataMemoryInfo.version;
     };
-    document.getElementById("cpu-load-size").innerHTML = getRandomInt(0, 100) + "%"; // <- заглушка
+    requestCPULoad.open("POST", "http://localhost:7000/api/cpu/load", true);
+    requestCPULoad.onload = function () {
+        let dataCPULoad = JSON.parse(requestCPULoad.responseText);
+        document.getElementById("cpu-load-size").innerHTML = parseFloat(dataCPULoad.data.load).toFixed(2) + "%";
+    }
     requestMemoryInfo.send();
+    requestCPULoad.send();
 }
