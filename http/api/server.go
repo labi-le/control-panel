@@ -134,9 +134,6 @@ func (s *Server) apiSettingsResolver(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) apiDashboardInfo(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-
 	method := NewMethods(w, s.DB)
 
 	data, err := ioutil.ReadAll(r.Body)
@@ -154,12 +151,13 @@ func (s *Server) apiDashboardInfo(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) apiDiskPartitions(w http.ResponseWriter, _ *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
 	ResponseMethod(NewMethods(w, s.DB).GetDiskPartitions())
 }
 
 func Response(response structures.Response, w http.ResponseWriter) {
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
 	switch response.Success {
 	case false:
 		w.WriteHeader(http.StatusBadRequest)
