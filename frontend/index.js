@@ -1,23 +1,33 @@
-setInterval(function() {
+let requests = setInterval(function() {
     updateStatistics();
 }, 1500);
 function updateStatistics() {
-    let requestMemoryInfo = new XMLHttpRequest();
-    let requestCPULoad = new XMLHttpRequest();
-    requestMemoryInfo.open("POST", "http://localhost:7000/api/memory/info", true);
-    requestMemoryInfo.onload = function () {
-        let dataMemoryInfo = JSON.parse(requestMemoryInfo.responseText);
-        document.getElementById("total-memory-size").innerHTML = formatBytes(dataMemoryInfo.data.total);
-        document.getElementById("usage-memory-size").innerHTML = formatBytes(dataMemoryInfo.data.total - dataMemoryInfo.data.free);
-        document.getElementById("available-memory-size").innerHTML = formatBytes(dataMemoryInfo.data.free);
+    let requestDashboard = new XMLHttpRequest();
+    requestDashboard.open("POST", "http://localhost:7000/api/dashboard", true);
+    requestDashboard.onload = function () {
+        let dataDashboard = JSON.parse(requestDashboard.responseText);
+        if (dataDashboard.success === false) {
+            showWindow("default", "Возникла ошибка при обработке запроса, попробуйте перезагрузить страницу");
+            clearInterval(requests);
+        }
+        // memory info
+        document.getElementById("total-memory-size").innerHTML = formatBytes(dataDashboard.data.mem.total);
+        document.getElementById("usage-memory-size").innerHTML = formatBytes(dataDashboard.data.mem.total - dataDashboard.data.mem.free);
+        document.getElementById("available-memory-size").innerHTML = formatBytes(dataDashboard.data.mem.free);
+        // CPU info
+        document.getElementById("cpu-load-size").innerHTML = parseFloat(dataDashboard.data.cpu_load.load).toFixed(2) + "%";
+        // disk info
+        document.querySelector(".disk-info-partitionType").innerHTML = "- Тип раздела ('" + dataDashboard.data.io.path + "'): " + dataDashboard.data.io.fstype;
+        document.querySelector(".disk-infoPartitionSize-total").innerHTML = "-- Всего: " + formatBytes(dataDashboard.data.io.total);
+        document.querySelector(".disk-infoPartitionSize-free").innerHTML = "-- Свободно: " + formatBytes(dataDashboard.data.io.free);
+        document.querySelector(".disk-infoPartitionSize-used").innerHTML = "-- Используется: " + formatBytes(dataDashboard.data.io.used);
+        document.querySelector(".disk-infoPartitionSize-usedPercent").innerHTML = "-- Используется (%): " + parseFloat(dataDashboard.data.io.usedPercent).toFixed(2) + "%";
         // update api/panel version
-        document.getElementById("footer-version").innerHTML = "v" + dataMemoryInfo.version;
+        document.getElementById("footer-version").innerHTML = "v" + dataDashboard.version;
     };
-    requestCPULoad.open("POST", "http://localhost:7000/api/cpu/load", true);
-    requestCPULoad.onload = function () {
-        let dataCPULoad = JSON.parse(requestCPULoad.responseText);
-        document.getElementById("cpu-load-size").innerHTML = parseFloat(dataCPULoad.data.load).toFixed(2) + "%";
+    requestDashboard.onerror = function () {
+        showWindow("default", "Возникла ошибка при обработке запроса, попробуйте перезагрузить страницу");
+        clearInterval(requests);
     }
-    requestMemoryInfo.send();
-    requestCPULoad.send();
+    requestDashboard.send(JSON.stringify({"path": "/"}));
 }
