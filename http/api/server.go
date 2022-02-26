@@ -60,19 +60,22 @@ func (s *Server) configureLogger() {
 	if err != nil {
 		panic("invalid log level")
 	}
+
 	s.logger.SetLevel(level)
 }
 
 func (s *Server) route() {
 	s.router.Use(s.logRequestMiddleware)
 
-	//web interface
+	// web interface
 	s.router.PathPrefix("/").Handler(http.FileServer(http.Dir("./frontend/"))).Methods(http.MethodGet)
-
-	// api put data
+	// api put\post data
 	s.router.HandleFunc("/api/settings", s.apiSettingsResolver).Methods(http.MethodPut, http.MethodPost)
-	// api info
-	s.router.HandleFunc("/api/{hardware}/{method}", s.hardwareInfoResolver).Methods(http.MethodPost)
+	// dashboard
+	s.router.HandleFunc("/api/dashboard", s.apiDashboardInfo).Methods(http.MethodPost)
+
+	// api get data
+	s.router.HandleFunc("/api/diskPartitions", s.apiDiskPartitions).Methods(http.MethodPost)
 }
 
 func (s *Server) logRequestMiddleware(next http.Handler) http.Handler {
@@ -130,53 +133,29 @@ func (s *Server) apiSettingsResolver(w http.ResponseWriter, r *http.Request) {
 	ResponseMethod(method.MethodNotFound())
 }
 
-func (s *Server) hardwareInfoResolver(w http.ResponseWriter, r *http.Request) {
+func (s *Server) apiDashboardInfo(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-
-	params := mux.Vars(r)
-	hardware := params["hardware"]
-	methodName := params["method"]
 
 	method := NewMethods(w, s.DB)
 
-	methodResponse := func() *Methods {
-		switch hardware {
-		case "cpu":
-			switch methodName {
-			case "info":
-				return method.GetCPUInfo()
-
-			case "load":
-				return method.GetCPULoad()
-
-			case "times":
-				return method.GetCPUTimes()
-			}
-
-		case "memory":
-			if methodName == "info" {
-				return method.GetVirtualMemory()
-			}
-
-		case "disk":
-			switch methodName {
-			case "info":
-				return method.GetDiskInfo(params["path"])
-
-			case "io":
-				return method.GetDiskIO()
-
-			case "partitions":
-				return method.GetDiskPartitions()
-			}
-
-		}
-
-		return method.MethodNotFound()
+	data, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		ResponseMethod(method.BadRequest(err))
 	}
 
-	ResponseMethod(methodResponse())
+	var dashboard structures.DashboardParams
+	if err := json.Unmarshal(data, &dashboard); err != nil {
+		ResponseMethod(method.BadRequest(err))
+		return
+	}
+
+	ResponseMethod(method.GetDashboardInfo(dashboard))
+}
+
+func (s *Server) apiDiskPartitions(w http.ResponseWriter, _ *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	ResponseMethod(NewMethods(w, s.DB).GetDiskPartitions())
 }
 
 func Response(response structures.Response, w http.ResponseWriter) {

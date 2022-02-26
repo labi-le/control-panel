@@ -1,6 +1,7 @@
-POST localhost:7000/api/disk/partitions
+#POST localhost:7000/api/diskPartitions
+POST localhost:7000/api/dashboard
 Content-Type: application/json
 
 {
-  "path": ""
+  "path": "/"
 }

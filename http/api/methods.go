@@ -24,9 +24,23 @@ func NewMethods(w http.ResponseWriter, db *internal.DB) *Methods {
 	}
 }
 
-// GetVirtualMemory returns virtual memory statistics.
-func (m *Methods) GetVirtualMemory() *Methods {
-	return m.SuccessResponse("Mem has been retrieved", internal.GetVirtualMemory())
+// GetDashboardInfo the method that will display statistics in the dashboard will call cpu_load, disk, mem, etc...
+func (m *Methods) GetDashboardInfo(dashboardParams structures.DashboardParams) *Methods {
+	cpuLoad, err := internal.GetCPULoad()
+	if err != nil {
+		return m.BadRequest(err)
+	}
+
+	io, err := internal.GetDiskInfo(dashboardParams.Path)
+	if err != nil {
+		return m.BadRequest(err)
+	}
+
+	return m.SuccessResponse("Dashboard has been retrieved", structures.Dashboard{
+		CPULoad: cpuLoad,
+		Mem:     internal.GetVirtualMemory(),
+		IO:      io,
+	})
 }
 
 // GetCPUInfo returns cpu statistics.
@@ -37,26 +51,6 @@ func (m *Methods) GetCPUInfo() *Methods {
 	}
 
 	return m.SuccessResponse("Cpu info has been retrieved", CPUInfo)
-}
-
-// GetCPULoad returns cpu usage statistics.
-func (m *Methods) GetCPULoad() *Methods {
-	CPUUsage, err := internal.GetCPULoad()
-	if err != nil {
-		return m.BadRequest(err)
-	}
-
-	return m.SuccessResponse("Cpu average has been retrieved", CPUUsage)
-}
-
-// GetDiskIO returns disk usage statistics.
-func (m *Methods) GetDiskIO() *Methods {
-	DiskUsage, err := internal.GetDiskIO()
-	if err != nil {
-		return m.BadRequest(err)
-	}
-
-	return m.SuccessResponse("Disk usage has been retrieved", DiskUsage)
 }
 
 // GetDiskPartitions returns disk partitions.
@@ -77,16 +71,6 @@ func (m *Methods) GetDiskInfo(path string) *Methods {
 	}
 
 	return m.SuccessResponse("Disk usage has been retrieved", DiskUsage)
-}
-
-// GetCPUTimes GetCpuTimes returns cpu usage statistics.
-func (m *Methods) GetCPUTimes() *Methods {
-	CPUTimes, err := internal.GetCPUTimes()
-	if err != nil {
-		return m.BadRequest(err)
-	}
-
-	return m.SuccessResponse("Cpu times has been retrieved", CPUTimes)
 }
 
 func (m *Methods) GetSettings() *Methods {
