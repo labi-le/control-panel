@@ -109,8 +109,6 @@ func (s *Server) logRequestMiddleware(next http.Handler) http.Handler {
 }
 
 func (s *Server) apiSettingsResolver(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
 
 	method := NewMethods(w, s.DB)
 
