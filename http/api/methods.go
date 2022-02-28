@@ -24,14 +24,23 @@ func NewMethods(w http.ResponseWriter, db *internal.DB) *Methods {
 	}
 }
 
-// GetVirtualMemory returns virtual memory statistics.
-func (m *Methods) GetVirtualMemory() *Methods {
-	Mem, err := internal.GetVirtualMemory()
+// GetDashboardInfo the method that will display statistics in the dashboard will call cpu_load, disk, mem, etc...
+func (m *Methods) GetDashboardInfo(dashboardParams structures.DashboardParams) *Methods {
+	cpuLoad, err := internal.GetCPULoad()
 	if err != nil {
 		return m.BadRequest(err)
 	}
 
-	return m.SuccessResponse("Mem has been retrieved", Mem)
+	io, err := internal.GetDiskInfo(dashboardParams.Path)
+	if err != nil {
+		return m.BadRequest(err)
+	}
+
+	return m.SuccessResponse("Dashboard has been retrieved", structures.Dashboard{
+		CPULoad: cpuLoad,
+		Mem:     internal.GetVirtualMemory(),
+		IO:      io,
+	})
 }
 
 // GetCPUInfo returns cpu statistics.
@@ -44,24 +53,24 @@ func (m *Methods) GetCPUInfo() *Methods {
 	return m.SuccessResponse("Cpu info has been retrieved", CPUInfo)
 }
 
-// GetCPUAvg returns cpu usage statistics.
-func (m *Methods) GetCPUAvg() *Methods {
-	CPUUsage, err := internal.GetAvg()
+// GetDiskPartitions returns disk partitions.
+func (m *Methods) GetDiskPartitions() *Methods {
+	DiskPartitions, err := internal.GetDiskPartitions()
 	if err != nil {
 		return m.BadRequest(err)
 	}
 
-	return m.SuccessResponse("Cpu average has been retrieved", CPUUsage)
+	return m.SuccessResponse("Disk partitions has been retrieved", DiskPartitions)
 }
 
-// GetCPUTimes GetCpuTimes returns cpu usage statistics.
-func (m *Methods) GetCPUTimes() *Methods {
-	CPUTimes, err := internal.GetCPUTimes()
+// GetDiskInfo returns disk usage statistics.
+func (m *Methods) GetDiskInfo(path string) *Methods {
+	DiskUsage, err := internal.GetDiskInfo(path)
 	if err != nil {
 		return m.BadRequest(err)
 	}
 
-	return m.SuccessResponse("Cpu times has been retrieved", CPUTimes)
+	return m.SuccessResponse("Disk usage has been retrieved", DiskUsage)
 }
 
 func (m *Methods) GetSettings() *Methods {

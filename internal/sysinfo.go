@@ -1,14 +1,19 @@
 package internal
 
 import (
+	"github.com/labi-le/control-panel/structures"
+	io "github.com/mackerelio/go-osstat/disk"
+	"github.com/pbnjay/memory"
 	"github.com/shirou/gopsutil/v3/cpu"
-	"github.com/shirou/gopsutil/v3/load"
-	"github.com/shirou/gopsutil/v3/mem"
+	"github.com/shirou/gopsutil/v3/disk"
 )
 
 // GetVirtualMemory returns virtual memory info
-func GetVirtualMemory() (*mem.VirtualMemoryStat, error) {
-	return mem.VirtualMemory()
+func GetVirtualMemory() *structures.Memory {
+	return &structures.Memory{
+		Total: memory.TotalMemory(),
+		Free:  memory.FreeMemory(),
+	}
 }
 
 // GetCPUInfo returns cpu info
@@ -16,9 +21,29 @@ func GetCPUInfo() ([]cpu.InfoStat, error) {
 	return cpu.Info()
 }
 
-// GetAvg returns cpu load
-func GetAvg() (*load.AvgStat, error) {
-	return load.Avg()
+// GetCPULoad returns cpu load
+func GetCPULoad() (*structures.CPULoad, error) {
+	percent, err := cpu.Percent(0, false)
+	if err != nil {
+		return nil, err
+	}
+
+	return &structures.CPULoad{Load: percent[0]}, nil
+}
+
+// GetDiskIO returns disk usage
+func GetDiskIO() ([]io.Stats, error) {
+	return io.Get()
+}
+
+// GetDiskPartitions returns disk partitions
+func GetDiskPartitions() ([]disk.PartitionStat, error) {
+	return disk.Partitions(true)
+}
+
+// GetDiskInfo returns disk info
+func GetDiskInfo(path string) (*disk.UsageStat, error) {
+	return disk.Usage(path)
 }
 
 // GetCPUTimes GetCpuTimes returns cpu times
