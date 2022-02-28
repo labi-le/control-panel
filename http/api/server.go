@@ -109,7 +109,6 @@ func (s *Server) logRequestMiddleware(next http.Handler) http.Handler {
 }
 
 func (s *Server) apiSettingsResolver(w http.ResponseWriter, r *http.Request) {
-
 	method := NewMethods(w, s.DB)
 
 	if r.Method == http.MethodPost {

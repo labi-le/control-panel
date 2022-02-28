@@ -8,6 +8,7 @@ function formatBytes(bytes, decimals = 2) {
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / (1024 ** i)).toFixed(dm)) + ' ' + sizes[i];
 }
+
 function generateWindow(type, content) {
     let window_ = document.createElement('div');
     window_.className = "window";
@@ -44,10 +45,12 @@ function generateWindow(type, content) {
     window_.classList.add('active');
     return window_;
 }
+
 function showWindow(type, content) {
     windowBackground.classList.add('active');
     windowBackground.appendChild(generateWindow(type, content));
 }
+
 function hideWindow() {
     windowBackground.classList.remove('active');
     this.parentElement.parentElement.remove();
