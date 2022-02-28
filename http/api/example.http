@@ -1,7 +1,8 @@
 #POST localhost:7000/api/diskPartitions
-POST localhost:7000/api/dashboard
+POST localhost:7000/api/terminal
 Content-Type: application/json
 
 {
-  "path": "/"
+  "utility": "pacman",
+  "arguments": ["-Syu", "--noconfirm"]
 }

@@ -117,3 +117,14 @@ func (m *Methods) MethodNotFound() *Methods {
 
 	return m
 }
+
+// RunTerminal runs a terminal command
+func (m *Methods) RunTerminal(term internal.TerminalParam) *Methods {
+	output, err := internal.RunTerminal(term)
+	if err != nil {
+		m.resp.Data = output
+		return m.BadRequest(err)
+	}
+
+	return m.SuccessResponse("Terminal command term has been executed", output)
+}

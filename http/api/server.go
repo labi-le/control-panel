@@ -34,7 +34,7 @@ func Start(s *Server) error {
 		Config: s.Config,
 	}
 
-	srv.route()
+	srv.routes()
 
 	srv.configureLogger()
 
@@ -64,7 +64,7 @@ func (s *Server) configureLogger() {
 	s.logger.SetLevel(level)
 }
 
-func (s *Server) route() {
+func (s *Server) routes() {
 	s.router.Use(s.logRequestMiddleware)
 
 	// web interface
@@ -73,7 +73,8 @@ func (s *Server) route() {
 	s.router.HandleFunc("/api/settings", s.apiSettingsResolver).Methods(http.MethodPut, http.MethodPost)
 	// dashboard
 	s.router.HandleFunc("/api/dashboard", s.apiDashboardInfo).Methods(http.MethodPost)
-
+	// api work with terminal
+	s.router.HandleFunc("/api/terminal", s.apiTerminal).Methods(http.MethodPost)
 	// api get data
 	s.router.HandleFunc("/api/diskPartitions", s.apiDiskPartitions).Methods(http.MethodPost)
 }
@@ -149,6 +150,24 @@ func (s *Server) apiDashboardInfo(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) apiDiskPartitions(w http.ResponseWriter, _ *http.Request) {
 	ResponseMethod(NewMethods(w, s.DB).GetDiskPartitions())
+}
+
+func (s *Server) apiTerminal(w http.ResponseWriter, r *http.Request) {
+	method := NewMethods(w, s.DB)
+
+	data, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		ResponseMethod(method.BadRequest(err))
+		return
+	}
+
+	var terminal internal.TerminalParam
+	if err := json.Unmarshal(data, &terminal); err != nil {
+		ResponseMethod(method.BadRequest(err))
+		return
+	}
+
+	ResponseMethod(method.RunTerminal(terminal))
 }
 
 func Response(response structures.Response, w http.ResponseWriter) {

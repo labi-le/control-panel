@@ -12,5 +12,5 @@ type Dashboard struct {
 
 type DashboardParams struct {
 	Path string `json:"path"`
-	//...
+	// ...
 }
