@@ -27,12 +27,12 @@ func (conn *DB) Migrate() error {
 // GetSettings returns the settings
 // if the settings are not found, it will save and return default settings
 func (conn *DB) GetSettings() (*structures.PanelSettings, error) {
-	var settings structures.PanelSettings
-	if err := conn.db.FirstOrCreate(&settings).Error; err != nil {
-		return structures.DefaultPanelSettings(), nil
+	var settings *structures.PanelSettings
+	if err := conn.db.FirstOrCreate(settings).Error; err != nil {
+		settings = structures.DefaultPanelSettings()
 	}
 
-	return &settings, nil
+	return settings, nil
 }
 
 // UpdateSettings updates the settings
