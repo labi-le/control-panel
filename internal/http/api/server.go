@@ -1,13 +1,11 @@
 package api
 
 import (
-	"encoding/json"
+	"fmt"
 	"github.com/gorilla/mux"
-	"github.com/labi-le/control-panel/internal"
-	structures2 "github.com/labi-le/control-panel/internal/structures"
+	"github.com/labi-le/control-panel/internal/structures"
 	"github.com/rs/cors"
 	"github.com/sirupsen/logrus"
-	"io/ioutil"
 	"net/http"
 	"time"
 )
@@ -16,33 +14,21 @@ type Server struct {
 	router *mux.Router
 	logger *logrus.Logger
 
-	Config *structures2.Config
-	DB     *internal.DB
+	Config *structures.Config
 }
 
-// implement
-func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	s.router.ServeHTTP(w, r)
+func NewServer(router *mux.Router, config *structures.Config) *Server {
+	return &Server{router: router, logger: logrus.New(), Config: config}
 }
 
-func Start(s *Server) error {
-	srv := &Server{
-		router: mux.NewRouter(),
-		logger: logrus.New(),
+func (s *Server) Start() error {
+	s.configureLogger()
 
-		DB:     internal.NewDB(s.Config),
-		Config: s.Config,
-	}
-
-	srv.route()
-
-	srv.configureLogger()
-
-	srv.logger.Log(logrus.InfoLevel, "Rest api started")
+	s.logger.Log(logrus.InfoLevel, "Rest api started")
 
 	server := &http.Server{
-		Handler: srv,
-		Addr:    srv.Config.Addr,
+		Handler: s,
+		Addr:    fmt.Sprintf("%s:%s", s.Config.Addr, s.Config.Port),
 	}
 
 	c := cors.New(cors.Options{
@@ -50,9 +36,14 @@ func Start(s *Server) error {
 		AllowCredentials: true,
 	})
 
-	c.Handler(srv)
+	c.Handler(s)
 
 	return server.ListenAndServe()
+}
+
+// implement
+func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	s.router.ServeHTTP(w, r)
 }
 
 func (s *Server) configureLogger() {
@@ -62,20 +53,6 @@ func (s *Server) configureLogger() {
 	}
 
 	s.logger.SetLevel(level)
-}
-
-func (s *Server) route() {
-	s.router.Use(s.logRequestMiddleware)
-
-	// web interface
-	s.router.PathPrefix("/").Handler(http.FileServer(http.Dir("./frontend/"))).Methods(http.MethodGet)
-	// api put\post data
-	s.router.HandleFunc("/api/settings", s.apiSettingsResolver).Methods(http.MethodPut, http.MethodPost)
-	// dashboard
-	s.router.HandleFunc("/api/dashboard", s.apiDashboardInfo).Methods(http.MethodPost)
-
-	// api get data
-	s.router.HandleFunc("/api/diskPartitions", s.apiDiskPartitions).Methods(http.MethodPost)
 }
 
 func (s *Server) logRequestMiddleware(next http.Handler) http.Handler {
@@ -106,66 +83,4 @@ func (s *Server) logRequestMiddleware(next http.Handler) http.Handler {
 			time.Since(start),
 		)
 	})
-}
-
-func (s *Server) apiSettingsResolver(w http.ResponseWriter, r *http.Request) {
-	method := NewMethods(w, s.DB)
-
-	if r.Method == http.MethodPost {
-		ResponseMethod(method.GetSettings())
-		return
-	} else if r.Method == http.MethodPut {
-		var settings structures2.PanelSettings
-
-		body, _ := ioutil.ReadAll(r.Body)
-		err := json.Unmarshal(body, &settings)
-		if err != nil {
-			ResponseMethod(method.BadRequest(err))
-			return
-		}
-		ResponseMethod(method.UpdateSettings(settings))
-		return
-	}
-
-	ResponseMethod(method.MethodNotFound())
-}
-
-func (s *Server) apiDashboardInfo(w http.ResponseWriter, r *http.Request) {
-	method := NewMethods(w, s.DB)
-
-	data, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		ResponseMethod(method.BadRequest(err))
-	}
-
-	var dashboard structures2.DashboardParams
-	if err := json.Unmarshal(data, &dashboard); err != nil {
-		ResponseMethod(method.BadRequest(err))
-		return
-	}
-
-	ResponseMethod(method.GetDashboardInfo(dashboard))
-}
-
-func (s *Server) apiDiskPartitions(w http.ResponseWriter, _ *http.Request) {
-	ResponseMethod(NewMethods(w, s.DB).GetDiskPartitions())
-}
-
-func Response(response structures2.Response, w http.ResponseWriter) {
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-
-	switch response.Success {
-	case false:
-		w.WriteHeader(http.StatusBadRequest)
-
-	case true:
-		w.WriteHeader(http.StatusOK)
-	}
-
-	_ = json.NewEncoder(w).Encode(response)
-}
-
-func ResponseMethod(m *Methods) {
-	Response(m.resp, m.w)
 }

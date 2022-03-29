@@ -20,24 +20,22 @@ func init() {
 func main() {
 	flag.Parse()
 
-	Config := structures.Config{}
-	_, err := toml.DecodeFile(config, &Config)
+	var conf *structures.Config
+	_, err := toml.DecodeFile(config, &conf)
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	server := api.Server{
-		Config: &Config,
-		DB:     internal.NewDB(&Config),
-	}
-
-	if server.DB.Migrate() != nil {
+	db := internal.NewDB(conf)
+	if db.Migrate() != nil {
 		log.Fatal(err)
 	}
 
-	err = api.Start(&server)
-	if err != nil {
+	apiResolver := api.NewMethods(db)
+	srv := api.NewServer(apiResolver.GetRoutes(), conf)
+
+	if srv.Start() != nil {
 		log.Fatal(err)
 	}
 }

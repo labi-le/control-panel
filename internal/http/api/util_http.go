@@ -1,23 +1,50 @@
 package api
 
-func (m *Methods) SuccessResponse(msg string, data interface{}) *Methods {
-	m.resp.Success = true
-	m.resp.Message = msg
-	m.resp.Data = data
+import (
+	"encoding/json"
+	"github.com/labi-le/control-panel/internal/structures"
+	"net/http"
+	"time"
+)
 
-	return m
+func SuccessResponse(w http.ResponseWriter, msg string, data interface{}) {
+	r := structures.Response{
+		Success: true,
+		Message: msg,
+		Data:    data,
+	}
+
+	response(w, r)
 }
 
-func (m *Methods) BadRequest(err error) *Methods {
-	m.resp.Success = false
-	m.resp.Message = err.Error()
+func BadRequest(w http.ResponseWriter, err error) {
+	r := structures.Response{
+		Success: false,
+		Message: err.Error(),
+		Data:    []string{},
+	}
 
-	return m
+	response(w, r)
 }
 
-func (m *Methods) MethodNotFound() *Methods {
-	m.resp.Success = false
-	m.resp.Message = "Method not found"
+func MethodNotFound(w http.ResponseWriter) {
+	w.WriteHeader(http.StatusNotFound)
+}
 
-	return m
+func response(w http.ResponseWriter, response structures.Response) {
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
+	response.Time = time.Now()
+	response.Version = "1.0.0"
+
+	switch response.Success {
+	case false:
+		w.WriteHeader(http.StatusBadRequest)
+
+	case true:
+		w.WriteHeader(http.StatusOK)
+	}
+
+	_ = json.NewEncoder(w).Encode(response)
 }

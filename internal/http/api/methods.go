@@ -1,97 +1,139 @@
 package api
 
 import (
+	"encoding/json"
+	"errors"
+	"github.com/gorilla/mux"
 	"github.com/labi-le/control-panel/internal"
-	structures2 "github.com/labi-le/control-panel/internal/structures"
+	"github.com/labi-le/control-panel/internal/structures"
+	"io/ioutil"
 	"net/http"
-	"time"
 )
 
 type Methods struct {
-	resp structures2.Response
-	w    http.ResponseWriter
-	db   *internal.DB
+	db *internal.DB
 }
 
-func NewMethods(w http.ResponseWriter, db *internal.DB) *Methods {
-	return &Methods{
-		resp: structures2.Response{
-			Version: "0.1",
-			Time:    time.Now(),
-		},
-		w:  w,
-		db: db,
+func NewMethods(db *internal.DB) *Methods {
+	return &Methods{db: db}
+}
+
+func (m *Methods) GetRoutes() *mux.Router {
+	r := mux.NewRouter()
+
+	// web interface
+	r.PathPrefix("/").Handler(http.FileServer(http.Dir("./frontend/"))).Methods(http.MethodGet)
+	// api put\post data
+	r.HandleFunc("/api/settings", m.ApiSettingsResolver).Methods(http.MethodPut, http.MethodPost)
+	// dashboard
+	r.HandleFunc("/api/dashboard", m.GetDashboardInfo).Methods(http.MethodPost)
+	// api get data
+	r.HandleFunc("/api/diskPartitions", m.GetDiskPartitions).Methods(http.MethodPost)
+
+	return r
+}
+
+func (m *Methods) ApiSettingsResolver(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodPut:
+		m.updateSettings(w, r)
+	case http.MethodPost:
+		m.getSettings(w, r)
+
+	default:
+		MethodNotFound(w)
 	}
 }
 
 // GetDashboardInfo the method that will display statistics in the dashboard will call cpu_load, disk, mem, etc...
-func (m *Methods) GetDashboardInfo(dashboardParams structures2.DashboardParams) *Methods {
+func (m *Methods) GetDashboardInfo(w http.ResponseWriter, r *http.Request) {
+	data, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		BadRequest(w, err)
+	}
+
+	var dashboard structures.DashboardParams
+	if err := json.Unmarshal(data, &dashboard); err != nil {
+		BadRequest(w, err)
+	}
+
 	cpuLoad, err := internal.GetCPULoad()
 	if err != nil {
-		return m.BadRequest(err)
+		BadRequest(w, err)
 	}
 
-	io, err := internal.GetDiskInfo(dashboardParams.Path)
+	io, err := internal.GetDiskInfo(dashboard.Path)
 	if err != nil {
-		return m.BadRequest(err)
+		BadRequest(w, err)
 	}
 
-	return m.SuccessResponse("Dashboard has been retrieved", structures2.Dashboard{
+	SuccessResponse(w, "Dashboard has been retrieved", structures.Dashboard{
 		CPULoad: cpuLoad,
 		Mem:     internal.GetVirtualMemory(),
 		IO:      io,
 	})
 }
 
-// GetCPUInfo returns cpu statistics.
-func (m *Methods) GetCPUInfo() *Methods {
+// getCPUInfo returns cpu statistics.
+func (m *Methods) getCPUInfo(w http.ResponseWriter, _ *http.Request) {
 	CPUInfo, err := internal.GetCPUInfo()
 	if err != nil {
-		return m.BadRequest(err)
+		BadRequest(w, err)
 	}
 
-	return m.SuccessResponse("Cpu info has been retrieved", CPUInfo)
+	SuccessResponse(w, "Cpu info has been retrieved", CPUInfo)
 }
 
 // GetDiskPartitions returns disk partitions.
-func (m *Methods) GetDiskPartitions() *Methods {
+func (m *Methods) GetDiskPartitions(w http.ResponseWriter, _ *http.Request) {
 	DiskPartitions, err := internal.GetDiskPartitions()
 	if err != nil {
-		return m.BadRequest(err)
+		BadRequest(w, err)
 	}
 
-	return m.SuccessResponse("Disk partitions has been retrieved", DiskPartitions)
+	SuccessResponse(w, "Disk partitions has been retrieved", DiskPartitions)
 }
 
-// GetDiskInfo returns disk usage statistics.
-func (m *Methods) GetDiskInfo(path string) *Methods {
+// getDiskInfo returns disk usage statistics.
+func (m *Methods) getDiskInfo(w http.ResponseWriter, r *http.Request) {
+	param := mux.Vars(r)
+	path := param["path"]
+	if path == "" {
+		BadRequest(w, errors.New("param path is empty"))
+	}
+
 	DiskUsage, err := internal.GetDiskInfo(path)
 	if err != nil {
-		return m.BadRequest(err)
+		BadRequest(w, err)
 	}
 
-	return m.SuccessResponse("Disk usage has been retrieved", DiskUsage)
+	SuccessResponse(w, "Disk usage has been retrieved", DiskUsage)
 }
 
-func (m *Methods) GetSettings() *Methods {
+func (m *Methods) getSettings(w http.ResponseWriter, _ *http.Request) {
 	settings, err := m.db.GetSettings()
 	if err != nil {
-		return m.BadRequest(err)
+		BadRequest(w, err)
 	}
 
-	m.resp.Success = true
-	m.resp.Message = "Settings has been retrieved"
-	m.resp.Data = settings
-
-	return m
+	SuccessResponse(w, "Settings has been retrieved", settings)
 }
 
-// UpdateSettings updates settings
-func (m *Methods) UpdateSettings(settings structures2.PanelSettings) *Methods {
-	err := m.db.UpdateSettings(settings)
+// updateSettings updates settings
+func (m *Methods) updateSettings(w http.ResponseWriter, r *http.Request) {
+	var settings structures.PanelSettings
+
+	body, _ := ioutil.ReadAll(r.Body)
+	err := json.Unmarshal(body, &settings)
 	if err != nil {
-		return m.BadRequest(err)
+		BadRequest(w, err)
+
 	}
 
-	return m.SuccessResponse("Settings has been updated", []string{})
+	err = m.db.UpdateSettings(settings)
+	if err != nil {
+		BadRequest(w, err)
+	}
+
+	SuccessResponse(w, "Settings has been updated", settings)
 }
