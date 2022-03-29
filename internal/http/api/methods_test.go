@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"github.com/labi-le/control-panel/internal"
 	"github.com/labi-le/control-panel/internal/structures"
+	"github.com/shirou/gopsutil/v3/disk"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"net/http"
@@ -129,5 +130,30 @@ func TestMethods_GetDashboardInfo(t *testing.T) {
 
 	if response.Data.Mem == nil || response.Data.CPULoad == nil || response.Data.IO == nil {
 		t.Fatal("GetDashboardInfo() returned wrong body")
+	}
+}
+
+func TestMethods_GetDiskPartitions(t *testing.T) {
+	r := httptest.NewRequest(http.MethodPost, "/api/disk_partitions", nil)
+	w := httptest.NewRecorder()
+
+	m.GetDiskPartitions(w, r)
+
+	if w.Code != http.StatusOK {
+		t.Fatal("GetDiskPartitions() returned wrong status code")
+	}
+
+	type testResp struct {
+		structures.Response
+		Data []disk.PartitionStat `json:"data"`
+	}
+
+	response := testResp{}
+	if json.Unmarshal(w.Body.Bytes(), &response) != nil {
+		t.Fatal("GetDiskPartitions() returned wrong body")
+	}
+
+	if response.Data == nil {
+		t.Fatal("GetDiskPartitions() returned wrong body")
 	}
 }

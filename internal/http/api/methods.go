@@ -28,7 +28,7 @@ func (m *Methods) GetRoutes() *mux.Router {
 	// dashboard
 	r.HandleFunc("/api/dashboard", m.GetDashboardInfo).Methods(http.MethodPost)
 	// api get data
-	r.HandleFunc("/api/diskPartitions", m.GetDiskPartitions).Methods(http.MethodPost)
+	r.HandleFunc("/api/disk_partitions", m.GetDiskPartitions).Methods(http.MethodPost)
 
 	return r
 }
