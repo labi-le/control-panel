@@ -2,20 +2,20 @@ package api
 
 import (
 	"github.com/labi-le/control-panel/internal"
-	"github.com/labi-le/control-panel/structures"
+	structures2 "github.com/labi-le/control-panel/internal/structures"
 	"net/http"
 	"time"
 )
 
 type Methods struct {
-	resp structures.Response
+	resp structures2.Response
 	w    http.ResponseWriter
 	db   *internal.DB
 }
 
 func NewMethods(w http.ResponseWriter, db *internal.DB) *Methods {
 	return &Methods{
-		resp: structures.Response{
+		resp: structures2.Response{
 			Version: "0.1",
 			Time:    time.Now(),
 		},
@@ -25,7 +25,7 @@ func NewMethods(w http.ResponseWriter, db *internal.DB) *Methods {
 }
 
 // GetDashboardInfo the method that will display statistics in the dashboard will call cpu_load, disk, mem, etc...
-func (m *Methods) GetDashboardInfo(dashboardParams structures.DashboardParams) *Methods {
+func (m *Methods) GetDashboardInfo(dashboardParams structures2.DashboardParams) *Methods {
 	cpuLoad, err := internal.GetCPULoad()
 	if err != nil {
 		return m.BadRequest(err)
@@ -36,7 +36,7 @@ func (m *Methods) GetDashboardInfo(dashboardParams structures.DashboardParams) *
 		return m.BadRequest(err)
 	}
 
-	return m.SuccessResponse("Dashboard has been retrieved", structures.Dashboard{
+	return m.SuccessResponse("Dashboard has been retrieved", structures2.Dashboard{
 		CPULoad: cpuLoad,
 		Mem:     internal.GetVirtualMemory(),
 		IO:      io,
@@ -87,33 +87,11 @@ func (m *Methods) GetSettings() *Methods {
 }
 
 // UpdateSettings updates settings
-func (m *Methods) UpdateSettings(settings structures.PanelSettings) *Methods {
+func (m *Methods) UpdateSettings(settings structures2.PanelSettings) *Methods {
 	err := m.db.UpdateSettings(settings)
 	if err != nil {
 		return m.BadRequest(err)
 	}
 
 	return m.SuccessResponse("Settings has been updated", []string{})
-}
-
-func (m *Methods) SuccessResponse(msg string, data interface{}) *Methods {
-	m.resp.Success = true
-	m.resp.Message = msg
-	m.resp.Data = data
-
-	return m
-}
-
-func (m *Methods) BadRequest(err error) *Methods {
-	m.resp.Success = false
-	m.resp.Message = err.Error()
-
-	return m
-}
-
-func (m *Methods) MethodNotFound() *Methods {
-	m.resp.Success = false
-	m.resp.Message = "Method not found"
-
-	return m
 }

@@ -1,7 +1,7 @@
 package internal
 
 import (
-	"github.com/labi-le/control-panel/structures"
+	structures2 "github.com/labi-le/control-panel/internal/structures"
 	io "github.com/mackerelio/go-osstat/disk"
 	"github.com/pbnjay/memory"
 	"github.com/shirou/gopsutil/v3/cpu"
@@ -9,8 +9,8 @@ import (
 )
 
 // GetVirtualMemory returns virtual memory info
-func GetVirtualMemory() *structures.Memory {
-	return &structures.Memory{
+func GetVirtualMemory() *structures2.Memory {
+	return &structures2.Memory{
 		Total: memory.TotalMemory(),
 		Free:  memory.FreeMemory(),
 	}
@@ -22,13 +22,13 @@ func GetCPUInfo() ([]cpu.InfoStat, error) {
 }
 
 // GetCPULoad returns cpu load
-func GetCPULoad() (*structures.CPULoad, error) {
+func GetCPULoad() (*structures2.CPULoad, error) {
 	percent, err := cpu.Percent(0, false)
 	if err != nil {
 		return nil, err
 	}
 
-	return &structures.CPULoad{Load: percent[0]}, nil
+	return &structures2.CPULoad{Load: percent[0]}, nil
 }
 
 // GetDiskIO returns disk usage

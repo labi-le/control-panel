@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"github.com/gorilla/mux"
 	"github.com/labi-le/control-panel/internal"
-	"github.com/labi-le/control-panel/structures"
+	structures2 "github.com/labi-le/control-panel/internal/structures"
 	"github.com/rs/cors"
 	"github.com/sirupsen/logrus"
 	"io/ioutil"
@@ -16,7 +16,7 @@ type Server struct {
 	router *mux.Router
 	logger *logrus.Logger
 
-	Config *structures.Config
+	Config *structures2.Config
 	DB     *internal.DB
 }
 
@@ -115,7 +115,7 @@ func (s *Server) apiSettingsResolver(w http.ResponseWriter, r *http.Request) {
 		ResponseMethod(method.GetSettings())
 		return
 	} else if r.Method == http.MethodPut {
-		var settings structures.PanelSettings
+		var settings structures2.PanelSettings
 
 		body, _ := ioutil.ReadAll(r.Body)
 		err := json.Unmarshal(body, &settings)
@@ -138,7 +138,7 @@ func (s *Server) apiDashboardInfo(w http.ResponseWriter, r *http.Request) {
 		ResponseMethod(method.BadRequest(err))
 	}
 
-	var dashboard structures.DashboardParams
+	var dashboard structures2.DashboardParams
 	if err := json.Unmarshal(data, &dashboard); err != nil {
 		ResponseMethod(method.BadRequest(err))
 		return
@@ -151,7 +151,7 @@ func (s *Server) apiDiskPartitions(w http.ResponseWriter, _ *http.Request) {
 	ResponseMethod(NewMethods(w, s.DB).GetDiskPartitions())
 }
 
-func Response(response structures.Response, w http.ResponseWriter) {
+func Response(response structures2.Response, w http.ResponseWriter) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 

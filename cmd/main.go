@@ -3,9 +3,9 @@ package main
 import (
 	"flag"
 	"github.com/BurntSushi/toml"
-	"github.com/labi-le/control-panel/http/api"
 	"github.com/labi-le/control-panel/internal"
-	"github.com/labi-le/control-panel/structures"
+	"github.com/labi-le/control-panel/internal/http/api"
+	"github.com/labi-le/control-panel/internal/structures"
 	"log"
 )
 
