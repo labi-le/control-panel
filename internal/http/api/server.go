@@ -24,6 +24,7 @@ func NewServer(router *mux.Router, config *structures.Config) *Server {
 func (s *Server) Start() error {
 	s.configureLogger()
 
+	s.logger.Log(logrus.InfoLevel, "Server configuration:\n", s.Config.String())
 	s.logger.Log(logrus.InfoLevel, "Rest api started")
 
 	server := &http.Server{
