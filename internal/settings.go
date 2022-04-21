@@ -40,7 +40,8 @@ func NewPanelSettings(settingsPath string) (*PanelSettings, error) {
 		settingsPath = DefaultConfigPath
 	}
 
-	if _, err := os.Stat(settingsPath); os.IsNotExist(err) {
+	if _, err := os.Stat(settingsPath + DefaultSettingsFile); os.IsNotExist(err) {
+		fmt.Printf("File does not exist, creating in %s...", settingsPath)
 		err := os.MkdirAll(settingsPath, os.ModePerm)
 		if err != nil {
 			return nil, err
