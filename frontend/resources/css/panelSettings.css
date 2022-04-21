@@ -1,0 +1,42 @@
+.panelSettings {
+    display: inline-flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    background: var(--themeSecondLayerColor);
+    border: 4px solid var(--themeSecondLayerColor);
+    border-radius: 8px;
+    padding: 4px;
+}
+
+.panelSettings-header {
+    text-align: center;
+}
+
+.panelSettings-content {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+}
+
+.panelSettings-inner-block {
+    margin: 2px 4px;
+    padding: 2px 4px;
+}
+
+.panelSettings-inner-block-label {
+    text-align: center;
+    margin-bottom: 2px;
+}
+
+.panelSettings-inner-block-value {
+    margin: 2px 0;
+}
+
+.panelSettings-footer {
+    display: flex;
+    flex-wrap: wrap;
+    flex-grow: 1;
+    justify-content: space-between;
+    margin-top: 2px;
+    padding: 0 4px;
+}

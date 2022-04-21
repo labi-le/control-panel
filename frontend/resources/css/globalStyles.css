@@ -1,0 +1,50 @@
+@import url(https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700&display=swap);
+
+:root {
+
+    /*
+     * 1st layer - backgrounds
+     * 2st layer - any active blocks and contents of him
+     * 3st layer - panels (header, footer, etc.)
+     * 4st layer - special window (notifications, etc.)
+     */
+
+    --themeFirstLayerColor: #262626;
+    --themeSecondLayerColor: #2A2A2A;
+    --themeSecondLayerBlocksColor: #2E2E2E;
+    --themeSecondLayerBlocksFieldColor: #323232;
+    --themeThirdLayerColor: #202020;
+    --themeFourthLayerColor: #242424;
+    --themeTextColor: #FFFFFF;
+}
+
+html {
+    height: 100%;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+div {
+    background: inherit;
+}
+
+.text {
+    color: var(--themeTextColor);
+    font-family: system-ui;
+    font-weight: bold;
+}
+
+.formInput {
+    background: var(--themeSecondLayerBlocksFieldColor);
+    color: var(--themeTextColor);
+    border: none;
+    border-radius: 8px;
+    outline: none;
+    padding: 8px;
+}

@@ -1,60 +1,111 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <title>Панель управления</title>
-    <link href="index.css" rel="stylesheet">
+    <link href="resources/css/globalStyles.css" rel="stylesheet">
+    <link href="resources/css/index.css" rel="stylesheet">
+    <link href="resources/css/window_special.css" rel="stylesheet">
+    <link href="resources/css/dashboard.css" rel="stylesheet">
+    <link href="resources/css/panelSettings.css" rel="stylesheet">
 </head>
-<body class="body" onload="updateStatistics()">
-<div class="header">Панель управления</div>
+<body class="body" onload="initLocalStorage(); setContent('dashboard'); updateStatistics();">
+<div class="header">
+    <div class="text header-content" id="panelName">Панель управления</div>
+</div>
 <div class="wrapper">
     <div class="left-panel">
-        <div class="left-panel-category">Состояние сервера</div>
-        <div class="left-panel-category">Управление доменами</div>
-        <div class="left-panel-category">Управление почтой</div>
-        <div class="left-panel-category">Управление базами данных</div>
-        <div class="left-panel-category">Общие настройки</div>
-        <div class="left-panel-category" onclick="showWindow('default', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.')">Вызов тестового уведомления</div>
+        <div class="text left-panel-category" onclick="setContent('dashboard'); updateStatistics();">Состояние сервера</div>
+        <div class="text left-panel-category" onclick="setContent('manageDomains')">Управление доменами</div>
+        <div class="text left-panel-category" onclick="setContent('manageMail')">Управление почтой</div>
+        <div class="text left-panel-category" onclick="setContent('manageDatabases')">Управление базами данных</div>
+        <div class="text left-panel-category" onclick="setContent('panelSettings')">Настройки панели</div>
     </div>
     <div class="content">
-        <div class="dashboard">
-            <div class="dashboard-title">Общая информация</div>
-            <div class="dashboard-content">
-                <div class="inner-block total-memory">
-                    <div id="total-memory-text">Всего памяти</div>
-                    <div id="total-memory-size"></div>
-                </div>
-                <div class="inner-block usage-memory">
-                    <div id="usage-memory-text">Использование памяти</div>
-                    <div id="usage-memory-size"></div>
-                </div>
-                <div class="inner-block available-memory">
-                    <div id="available-memory-text">Доступно памяти</div>
-                    <div id="available-memory-size"></div>
-                </div>
-                <div class="inner-block cpu-load">
-                    <div id="cpu-load-text">Нагрузка процессора</div>
-                    <div id="cpu-load-size"></div>
-                </div>
-                <div class="inner-block disk-info">
-                    <div id="disk-info-text">Сводка диска</div>
-                    <div id="disk-info-texts">
-                        <div class="disk-info-texts disk-info-partitionType"></div>
-                        <div class="disk-info-texts disk-info-partitionSize">
-                            <div class="disk-info-partitionSize disk-infoPartitionSize-total"></div>
-                            <div class="disk-info-partitionSize disk-infoPartitionSize-free"></div>
-                            <div class="disk-info-partitionSize disk-infoPartitionSize-used"></div>
-                            <div class="disk-info-partitionSize disk-infoPartitionSize-usedPercent"></div>
-                        </div>
+    </div>
+</div>
+<div class="footer">
+    <div class="text footer-content" id="footer-changeTheme" onclick="changeTheme(null)">Сменить тему</div>
+    <div class="text footer-content" id="footer-version"></div>
+</div>
+<div class="page-background"></div>
+</body>
+<script src="index.js"></script>
+<script src="resources/globalFunctions.js"></script>
+
+<template id="template-dashboard">
+    <div class="dashboard">
+        <div class="text dashboard-header">Общая информация</div>
+        <div class="dashboard-content">
+            <div class="dashboard-inner-block">
+                <div class="text dashboard-inner-block-label">Всего памяти</div>
+                <div class="text dashboard-inner-block-content" id="totalMemoryValue"></div>
+            </div>
+            <div class="dashboard-inner-block">
+                <div class="text dashboard-inner-block-label">Использование памяти</div>
+                <div class="text dashboard-inner-block-content" id="usageMemoryValue"></div>
+            </div>
+            <div class="dashboard-inner-block">
+                <div class="text dashboard-inner-block-label">Доступно памяти</div>
+                <div class="text dashboard-inner-block-content" id="freeMemoryValue"></div>
+            </div>
+            <div class="dashboard-inner-block">
+                <div class="text dashboard-inner-block-label">Нагрузка процессора</div>
+                <div class="text dashboard-inner-block-content" id="cpuLoadValue"></div>
+            </div>
+            <div class="dashboard-inner-block">
+                <div class="text dashboard-inner-block-label">Сводка диска</div>
+                <div class="dashboard-inner-block-content">
+                    <div class="text disk-info" id="partitionType"></div>
+                    <div class="disk-info">
+                        <div class="text disk-info-value" id="totalDiskSizeValue"></div>
+                        <div class="text disk-info-value" id="freeDiskSizeValue"></div>
+                        <div class="text disk-info-value" id="usedDiskSizeValue"></div>
+                        <div class="text disk-info-value" id="usedDiskSizeInPercentValue"></div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-<div class="footer" id="footer-version"></div>
-<div class="window-background"></div>
-</body>
-<script src="index.js"></script>
-<script src="globalFunctions.js"></script>
+</template>
+<template id="template-panelSettings">
+    <div class="panelSettings">
+        <div class="text panelSettings-header">Настройки</div>
+        <div class="panelSettings-content">
+            <div class="panelSettings-inner-block">
+                <div class="text panelSettings-inner-block-label">Изменить порт</div>
+                <input class="formInput panelSettings-inner-block-content" id="newPortValue" type="number" min="1" required>
+            </div>
+            <div class="panelSettings-inner-block">
+                <div class="text panelSettings-inner-block-label">Изменить язык</div>
+                <input class="formInput panelSettings-inner-block-content" id="newLanguageValue" required>
+            </div>
+        </div>
+        <div class="panelSettings-footer">
+            <div class="text panelSettings-footer-content" id="statusUpdateSettings"></div>
+            <div class="text panelSettings-footer-content" id="buttonUpdateSettings">Сохранить</div>
+        </div>
+    </div>
+</template>
+<template id="specialTemplate-window">
+    <div class="window">
+        <div class="window-header">
+            <div class="text window-header" id="titleWindow"></div>
+            <div class="text window-header" id="closeWindow" onclick="hideNotify()">Закрыть</div>
+        </div>
+        <div class="text window-body" id="contentWindow">
+            <!-- some content, generated by JS -->
+        </div>
+    </div>
+</template>
+<!--
+<template id="template-namePage">
+
+</template>
+
+<template id="specialTemplate-name">
+
+</template>
+-->
+
 </html>
