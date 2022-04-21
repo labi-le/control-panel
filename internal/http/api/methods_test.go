@@ -1,5 +1,8 @@
 package api
 
+//
+// @TODO Repair tests
+//
 import (
 	"bytes"
 	"encoding/json"
@@ -55,7 +58,7 @@ func TestMethods_GetSettings(t *testing.T) {
 
 	type testResp struct {
 		structures.Response
-		Data structures.PanelSettings `json:"data"`
+		Data internal.PanelSettings `json:"data"`
 	}
 
 	response := testResp{}
@@ -69,11 +72,7 @@ func TestMethods_GetSettings(t *testing.T) {
 	}
 }
 func TestMethods_UpdateSettings(t *testing.T) {
-	ps := structures.PanelSettings{
-		Port:     "7777",
-		Language: "jp",
-		Theme:    "dark",
-	}
+	ps := internal.DefaultPanelSettings()
 
 	body, _ := json.Marshal(ps)
 
@@ -88,7 +87,7 @@ func TestMethods_UpdateSettings(t *testing.T) {
 
 	type testResp struct {
 		structures.Response
-		Data structures.PanelSettings `json:"data"`
+		Data internal.PanelSettings `json:"data"`
 	}
 
 	response := testResp{}
@@ -97,7 +96,7 @@ func TestMethods_UpdateSettings(t *testing.T) {
 		t.Fatal("ApiSettingsResolver() returned wrong body")
 	}
 
-	if response.Data.Theme != ps.Theme || response.Data.Language != ps.Language || response.Data.Port != ps.Port {
+	if response.Data.Language != ps.Language || response.Data.Port != ps.Port || response.Data.LogLevel != ps.LogLevel {
 		t.Fatal("ApiSettingsResolver() returned wrong body")
 	}
 }

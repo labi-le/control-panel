@@ -1,24 +1,36 @@
-.PHONY: build
-.DEFAULT_GOAL := build
+.PHONY: run
+.DEFAULT_GOAL := run
 
-build-release:
-	@echo "Building..."
-	go build -ldflags "-s" -a -v -o build/package/control-panel-release cmd/main.go
+PROJ_NAME = control-panel
 
-build:
+MAIN_PATH = cmd/main.go
+BUILD_PATH = build/package/
+
+INSTALL_PATH = /usr/local/bin/
+
+export CGO_ENABLED = 1
+
+run:
+	go run $(MAIN_PATH)
+
+build-release: clean
 	@echo "Building..."
-	go build -v -o build/package/control-panel-debug cmd/main.go
+	go build -ldflags "-s" -a -v -o $(BUILD_PATH)$(PROJ_NAME) $(MAIN_PATH)
+
+build: clean
+	@echo "Building..."
+	go build -v -o $(BUILD_PATH)$(PROJ_NAME) $(MAIN_PATH)
 
 install: build-release uninstall
 	@echo "Installing..."
-	mv build/package/control-panel-release /usr/local/bin/control-panel
+	mv $(BUILD_PATH)$(PROJ_NAME) $(INSTALL_PATH)$(PROJ_NAME)
 
 uninstall:
 	@echo "Uninstalling..."
-	rm /usr/local/bin/control-panel
+	rm $(INSTALL_PATH)$(PROJ_NAME)
 	@echo "Remove configuration file..."
-	rm -rf ~/.config/control-panel/
+	rm -rf ~/.config/$(PROJ_NAME)/
 
 clean:
 	@echo "Cleaning..."
-	rm -rf build/package/*
+	rm -rf $(BUILD_PATH)*

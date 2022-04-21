@@ -4,6 +4,7 @@ go 1.17
 
 require (
 	github.com/BurntSushi/toml v1.0.0
+	github.com/davecgh/go-spew v1.1.1
 	github.com/gorilla/mux v1.8.0
 	github.com/mackerelio/go-osstat v0.2.1
 	github.com/pbnjay/memory v0.0.0-20210728143218-7b4eea64cf58

@@ -1,4 +1,0 @@
-addr = "0.0.0.0"
-port = "7000"
-dsn = "settings.db"
-log_level = "debug"

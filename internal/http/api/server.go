@@ -3,7 +3,7 @@ package api
 import (
 	"fmt"
 	"github.com/gorilla/mux"
-	"github.com/labi-le/control-panel/internal/structures"
+	"github.com/labi-le/control-panel/internal"
 	"github.com/rs/cors"
 	"github.com/sirupsen/logrus"
 	"net/http"
@@ -14,22 +14,22 @@ type Server struct {
 	router *mux.Router
 	logger *logrus.Logger
 
-	Config *structures.Config
+	PanelSettings *internal.PanelSettings
 }
 
-func NewServer(router *mux.Router, config *structures.Config) *Server {
-	return &Server{router: router, logger: logrus.New(), Config: config}
+func NewServer(router *mux.Router, config *internal.PanelSettings) *Server {
+	return &Server{router: router, logger: logrus.New(), PanelSettings: config}
 }
 
 func (s *Server) Start() error {
 	s.configureLogger()
 
-	s.logger.Log(logrus.InfoLevel, "Server configuration:\n", s.Config.String())
+	s.logger.Log(logrus.InfoLevel, "Server configuration:\n", s.PanelSettings.String())
 	s.logger.Log(logrus.InfoLevel, "Rest api started")
 
 	server := &http.Server{
 		Handler: s,
-		Addr:    fmt.Sprintf("%s:%s", s.Config.Addr, s.Config.Port),
+		Addr:    fmt.Sprintf("%s:%s", s.PanelSettings.Addr, s.PanelSettings.Port),
 	}
 
 	c := cors.New(cors.Options{
@@ -48,7 +48,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) configureLogger() {
-	level, err := logrus.ParseLevel(s.Config.LogLevel)
+	level, err := logrus.ParseLevel(s.PanelSettings.LogLevel)
 	if err != nil {
 		panic("invalid log level")
 	}

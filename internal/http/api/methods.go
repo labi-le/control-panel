@@ -11,11 +11,11 @@ import (
 )
 
 type Methods struct {
-	db *internal.DB
+	Settings *internal.PanelSettings
 }
 
-func NewMethods(db *internal.DB) *Methods {
-	return &Methods{db: db}
+func NewMethods(s *internal.PanelSettings) *Methods {
+	return &Methods{Settings: s}
 }
 
 func (m *Methods) GetRoutes() *mux.Router {
@@ -111,7 +111,7 @@ func (m *Methods) getDiskInfo(w http.ResponseWriter, r *http.Request) {
 }
 
 func (m *Methods) getSettings(w http.ResponseWriter, _ *http.Request) {
-	settings, err := m.db.GetSettings()
+	settings, err := m.Settings.GetSettings()
 	if err != nil {
 		BadRequest(w, err)
 	}
@@ -121,7 +121,7 @@ func (m *Methods) getSettings(w http.ResponseWriter, _ *http.Request) {
 
 // updateSettings updates settings
 func (m *Methods) updateSettings(w http.ResponseWriter, r *http.Request) {
-	var settings structures.PanelSettings
+	var settings internal.PanelSettings
 
 	body, _ := ioutil.ReadAll(r.Body)
 	err := json.Unmarshal(body, &settings)
@@ -130,7 +130,7 @@ func (m *Methods) updateSettings(w http.ResponseWriter, r *http.Request) {
 
 	}
 
-	err = m.db.UpdateSettings(settings)
+	err = m.Settings.UpdateSettings(settings)
 	if err != nil {
 		BadRequest(w, err)
 	}

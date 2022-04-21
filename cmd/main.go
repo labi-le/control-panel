@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/labi-le/control-panel/internal"
 	"github.com/labi-le/control-panel/internal/http/api"
-	"github.com/labi-le/control-panel/internal/structures"
 	"log"
 )
 
@@ -15,7 +14,7 @@ var (
 )
 
 func init() {
-	flag.StringVar(&config, "config", structures.DefaultConfig, "path to config file")
+	flag.StringVar(&config, "config", internal.DefaultConfigPath, "path to config file")
 	flag.BoolVar(&versionFlag, "version", false, "print version and exit")
 }
 
@@ -23,22 +22,16 @@ func main() {
 	flag.Parse()
 
 	if versionFlag == true {
-		fmt.Println(structures.PanelVersion)
+		fmt.Println(internal.PanelVersion)
 		return
 	}
 
-	conf := structures.NewConfig()
-	_, err := conf.LoadConfig(config)
+	conf, err := internal.NewPanelSettings(config)
 	if err != nil {
 		log.Fatal(err)
 	}
-	//
-	db := internal.NewDB(conf)
-	if err := db.Migrate(); err != nil {
-		log.Fatal(err)
-	}
 
-	apiResolver := api.NewMethods(db)
+	apiResolver := api.NewMethods(conf)
 	srv := api.NewServer(apiResolver.GetRoutes(), conf)
 
 	if err := srv.Start(); err != nil {
