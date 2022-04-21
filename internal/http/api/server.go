@@ -23,6 +23,7 @@ func NewServer(router *mux.Router, config *internal.PanelSettings) *Server {
 
 func (s *Server) Start() error {
 	s.configureLogger()
+	s.router.Use(s.logRequestMiddleware)
 
 	s.logger.Log(logrus.InfoLevel, "Server configuration:\n", s.PanelSettings.String())
 	s.logger.Log(logrus.InfoLevel, "Rest api started")
