@@ -1,5 +1,5 @@
 #POST localhost:7000/api/diskPartitions
-POST localhost:7000/api/dashboard
+POST localhost:7777/api/dashboard
 Content-Type: application/json
 
 {
