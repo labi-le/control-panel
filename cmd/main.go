@@ -1,11 +1,16 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"github.com/labi-le/control-panel/internal"
 	"github.com/labi-le/control-panel/internal/http/api"
 	"log"
+	"net/http"
+	"os"
+	"os/signal"
+	"time"
 )
 
 var (
@@ -34,7 +39,24 @@ func main() {
 	apiResolver := api.NewMethods(conf)
 	srv := api.NewServer(apiResolver.GetRoutes(), conf)
 
-	if err := srv.Start(); err != nil {
-		log.Fatal(err)
+	go func() {
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			srv.Logger().Fatal(err)
+		}
+	}()
+
+	// Setting up signal capturing
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, os.Interrupt)
+
+	// Waiting for SIGINT (kill -2)
+	<-stop
+	srv.Logger().Info("Gracefully shutdown server...")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	if err := srv.Shutdown(ctx); err != nil {
+		srv.Logger().Fatal(err)
 	}
+
 }

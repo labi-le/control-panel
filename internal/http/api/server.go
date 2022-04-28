@@ -15,20 +15,25 @@ type Server struct {
 	logger *logrus.Logger
 
 	PanelSettings *internal.PanelSettings
+	*http.Server
+}
+
+func (s *Server) Logger() *logrus.Logger {
+	return s.logger
 }
 
 func NewServer(router *mux.Router, config *internal.PanelSettings) *Server {
 	return &Server{router: router, logger: logrus.New(), PanelSettings: config}
 }
 
-func (s *Server) Start() error {
+func (s *Server) ListenAndServe() error {
 	s.configureLogger()
 	s.router.Use(s.logRequestMiddleware)
 
 	s.logger.Log(logrus.InfoLevel, "Server configuration:\n", s.PanelSettings.String())
 	s.logger.Log(logrus.InfoLevel, "Rest api started")
 
-	server := &http.Server{
+	s.Server = &http.Server{
 		Handler: s,
 		Addr:    fmt.Sprintf("%s:%s", s.PanelSettings.Addr, s.PanelSettings.Port),
 	}
@@ -40,7 +45,7 @@ func (s *Server) Start() error {
 
 	c.Handler(s)
 
-	return server.ListenAndServe()
+	return s.Server.ListenAndServe()
 }
 
 // implement
