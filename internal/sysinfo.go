@@ -1,7 +1,7 @@
 package internal
 
 import (
-	structures2 "github.com/labi-le/control-panel/internal/structures"
+	"github.com/labi-le/control-panel/internal/structures"
 	io "github.com/mackerelio/go-osstat/disk"
 	"github.com/pbnjay/memory"
 	"github.com/shirou/gopsutil/v3/cpu"
@@ -9,8 +9,8 @@ import (
 )
 
 // GetVirtualMemory returns virtual memory info
-func GetVirtualMemory() *structures2.Memory {
-	return &structures2.Memory{
+func GetVirtualMemory() *structures.Memory {
+	return &structures.Memory{
 		Total: memory.TotalMemory(),
 		Free:  memory.FreeMemory(),
 	}
@@ -22,13 +22,13 @@ func GetCPUInfo() ([]cpu.InfoStat, error) {
 }
 
 // GetCPULoad returns cpu load
-func GetCPULoad() (*structures2.CPULoad, error) {
+func GetCPULoad() (*structures.CPULoad, error) {
 	percent, err := cpu.Percent(0, false)
 	if err != nil {
 		return nil, err
 	}
 
-	return &structures2.CPULoad{Load: percent[0]}, nil
+	return &structures.CPULoad{Load: percent[0]}, nil
 }
 
 // GetDiskIO returns disk usage
@@ -37,13 +37,44 @@ func GetDiskIO() ([]io.Stats, error) {
 }
 
 // GetDiskPartitions returns disk partitions
-func GetDiskPartitions() ([]disk.PartitionStat, error) {
-	return disk.Partitions(true)
+func GetDiskPartitions() ([]structures.PartitionStat, error) {
+	partitions, err := disk.Partitions(true)
+	if err != nil {
+		return nil, err
+	}
+
+	var result []structures.PartitionStat
+	for _, partition := range partitions {
+		result = append(result, structures.PartitionStat{
+			Device:     partition.Device,
+			Mountpoint: partition.Mountpoint,
+			Fstype:     partition.Fstype,
+			Opts:       partition.Opts,
+		})
+	}
+
+	return result, nil
 }
 
 // GetDiskInfo returns disk info
-func GetDiskInfo(path string) (*disk.UsageStat, error) {
-	return disk.Usage(path)
+func GetDiskInfo(path string) (*structures.UsageStat, error) {
+	usage, err := disk.Usage(path)
+	if err != nil {
+		return nil, err
+	}
+
+	return &structures.UsageStat{
+		Path:              usage.Path,
+		Fstype:            usage.Fstype,
+		Total:             usage.Total,
+		Free:              usage.Free,
+		Used:              usage.Used,
+		UsedPercent:       usage.UsedPercent,
+		InodesTotal:       usage.InodesTotal,
+		InodesUsed:        usage.InodesUsed,
+		InodesFree:        usage.InodesFree,
+		InodesUsedPercent: usage.InodesUsedPercent,
+	}, err
 }
 
 // GetCPUTimes GetCpuTimes returns cpu times
