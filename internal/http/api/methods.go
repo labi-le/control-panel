@@ -3,11 +3,14 @@ package api
 import (
 	"encoding/json"
 	"errors"
-	"github.com/gorilla/mux"
 	"github.com/labi-le/control-panel/internal"
 	"github.com/labi-le/control-panel/internal/structures"
+	"github.com/labstack/echo/v4"
+	echoSwagger "github.com/swaggo/echo-swagger"
 	"io/ioutil"
 	"net/http"
+
+	_ "github.com/labi-le/control-panel/docs"
 )
 
 type Methods struct {
@@ -18,60 +21,68 @@ func NewMethods(s *internal.PanelSettings) *Methods {
 	return &Methods{Settings: s}
 }
 
-func (m *Methods) GetRoutes() *mux.Router {
-	r := mux.NewRouter()
+func (m *Methods) GetRoutes() *echo.Echo {
+	e := echo.New()
+
+	e.Static("/", "./frontend/")
+	e.Router().Add(http.MethodGet, "/", func(c echo.Context) error {
+		return c.File("./frontend/index.html")
+	})
+
+	e.Router().Add(http.MethodGet, "/swagger/*", echoSwagger.WrapHandler)
+
+	e.Router().Add(http.MethodGet, "/api/settings", m.getSettings)
+	e.Router().Add(http.MethodPut, "/api/settings", m.updateSettings)
+	e.Router().Add(http.MethodPost, "/api/dashboard", m.GetDashboardInfo)
+	e.Router().Add(http.MethodPost, "/api/disk_partitions", m.GetDiskPartitions)
 
 	// web interface
-	r.PathPrefix("/").Handler(http.FileServer(http.Dir("./frontend/"))).Methods(http.MethodGet)
 	// api put\post data
-	r.HandleFunc("/api/settings", m.ApiSettingsResolver).Methods(http.MethodPut, http.MethodPost)
-	// dashboard
-	r.HandleFunc("/api/dashboard", m.GetDashboardInfo).Methods(http.MethodPost)
-	// api get data
-	r.HandleFunc("/api/disk_partitions", m.GetDiskPartitions).Methods(http.MethodPost)
+	//// dashboard
+	//// api get data
+	//r.HandleFunc("/api/disk_partitions", m.GetDiskPartitions).Methods(http.MethodPost)
 
-	return r
-}
-
-func (m *Methods) ApiSettingsResolver(w http.ResponseWriter, r *http.Request) {
-	switch r.Method {
-	case http.MethodPut:
-		m.updateSettings(w, r)
-	case http.MethodPost:
-		m.getSettings(w, r)
-
-	default:
-		MethodNotFound(w)
-	}
+	return e
 }
 
 // GetDashboardInfo the method that will display statistics in the dashboard will call cpu_load, disk, mem, etc...
-func (m *Methods) GetDashboardInfo(w http.ResponseWriter, r *http.Request) {
-	data, err := ioutil.ReadAll(r.Body)
+// @Summary      Dashboard info
+// @Description  Get system information and state
+// @Tags         info
+// @Accept       json
+// @Produce      json
+// @Param        json  body      structures.DashboardParams  true  "Dashboard info"
+// @Success      200   {object}  structures.Dashboard        "Dashboard info"
+// @Failure      500  {object}  structures.Response
+// @Router       /dashboard [post]
+func (m *Methods) GetDashboardInfo(c echo.Context) error {
+	data, err := ioutil.ReadAll(c.Request().Body)
 	if err != nil {
-		BadRequest(w, err)
+		BadRequest(c.Response(), err)
 	}
 
 	var dashboard structures.DashboardParams
 	if err := json.Unmarshal(data, &dashboard); err != nil {
-		BadRequest(w, err)
+		BadRequest(c.Response(), err)
 	}
 
 	cpuLoad, err := internal.GetCPULoad()
 	if err != nil {
-		BadRequest(w, err)
+		BadRequest(c.Response(), err)
 	}
 
 	io, err := internal.GetDiskInfo(dashboard.Path)
 	if err != nil {
-		BadRequest(w, err)
+		BadRequest(c.Response(), err)
 	}
 
-	SuccessResponse(w, "Dashboard has been retrieved", structures.Dashboard{
+	SuccessResponse(c.Response(), "Dashboard has been retrieved", structures.Dashboard{
 		CPULoad: cpuLoad,
 		Mem:     internal.GetVirtualMemory(),
 		IO:      io,
 	})
+
+	return nil
 }
 
 // getCPUInfo returns cpu statistics.
@@ -85,55 +96,86 @@ func (m *Methods) getCPUInfo(w http.ResponseWriter, _ *http.Request) {
 }
 
 // GetDiskPartitions returns disk partitions.
-func (m *Methods) GetDiskPartitions(w http.ResponseWriter, _ *http.Request) {
+// @Summary      Disk partitions
+// @Description  Get disk partitions
+// @Tags         info
+// @Accept       json
+// @Produce      json
+// @Success      200  {object}  []structures.PartitionStat  "Disk partitions"
+// @Failure      500  {object}  structures.Response
+// @Router       /disk_partitions [post]
+func (m *Methods) GetDiskPartitions(c echo.Context) error {
 	DiskPartitions, err := internal.GetDiskPartitions()
 	if err != nil {
-		BadRequest(w, err)
+		BadRequest(c.Response(), err)
 	}
 
-	SuccessResponse(w, "Disk partitions has been retrieved", DiskPartitions)
+	SuccessResponse(c.Response(), "Disk partitions has been retrieved", DiskPartitions)
+	return nil
 }
 
 // getDiskInfo returns disk usage statistics.
-func (m *Methods) getDiskInfo(w http.ResponseWriter, r *http.Request) {
-	param := mux.Vars(r)
-	path := param["path"]
+func (m *Methods) getDiskInfo(c echo.Context) error {
+	// get var from request
+	path := c.QueryParam("path")
 	if path == "" {
-		BadRequest(w, errors.New("param path is empty"))
+		BadRequest(c.Response(), errors.New("param path is empty"))
 	}
 
 	DiskUsage, err := internal.GetDiskInfo(path)
 	if err != nil {
-		BadRequest(w, err)
+		BadRequest(c.Response(), err)
 	}
 
-	SuccessResponse(w, "Disk usage has been retrieved", DiskUsage)
+	SuccessResponse(c.Response(), "Disk usage has been retrieved", DiskUsage)
+	return nil
 }
 
-func (m *Methods) getSettings(w http.ResponseWriter, _ *http.Request) {
+// getSettings
+// @Summary      Get settings
+// @Description  Get settings
+// @Tags         settings
+// @Accept       json
+// @Produce      json
+// @Success      200  {object}  internal.PanelSettings  "Settings"
+// @Failure      500   {object}  structures.Response
+// @Router       /settings [post]
+func (m *Methods) getSettings(c echo.Context) error {
 	settings, err := m.Settings.GetSettings()
 	if err != nil {
-		BadRequest(w, err)
+		BadRequest(c.Response(), err)
 	}
 
-	SuccessResponse(w, "Settings has been retrieved", settings)
+	SuccessResponse(c.Response(), "Settings has been retrieved", settings)
+	return nil
 }
 
-// updateSettings updates settings
-func (m *Methods) updateSettings(w http.ResponseWriter, r *http.Request) {
+// updateSettings
+// @Summary      Update settings
+// @Description  Update settings
+// @Tags         settings
+// @Accept       json
+// @Produce      json
+// @Param        json  body      internal.PanelSettings  true  "Settings"
+// @Success      200   {object}  internal.PanelSettings  "Settings"
+// @Failure      400   {object}  structures.Response
+// @Failure      500   {object}  structures.Response
+// @Router       /settings [put]
+func (m *Methods) updateSettings(c echo.Context) error {
 	var settings internal.PanelSettings
 
-	body, _ := ioutil.ReadAll(r.Body)
+	body, _ := ioutil.ReadAll(c.Request().Body)
 	err := json.Unmarshal(body, &settings)
 	if err != nil {
-		BadRequest(w, err)
+		BadRequest(c.Response(), err)
 
 	}
 
 	err = m.Settings.UpdateSettings(settings)
 	if err != nil {
-		BadRequest(w, err)
+		BadRequest(c.Response(), err)
 	}
 
-	SuccessResponse(w, "Settings has been updated", settings)
+	SuccessResponse(c.Response(), "Settings has been updated", settings)
+	return nil
 }

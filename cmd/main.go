@@ -23,6 +23,16 @@ func init() {
 	flag.BoolVar(&versionFlag, "version", false, "print version and exit")
 }
 
+// @title          Control Panel API
+// @version        1.0
+// @description    Control Panel API
+// @contact.name   Control Panel API Support
+// @contact.url    https://github.com/labi-le/control-panel
+// @contact.email  https://github.com/labi-le/control-panel/issues
+// @license.name   GNU General Public License v3.0
+// @license.url    https://www.gnu.org/licenses/gpl-3.0.html
+// @host           localhost:8080
+// @BasePath       /api
 func main() {
 	flag.Parse()
 
