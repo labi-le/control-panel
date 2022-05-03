@@ -1,4 +1,4 @@
-.dashboard {
+.dashboard#dashboard-block {
     display: inline-flex;
     flex-direction: column;
     flex-wrap: wrap;
@@ -8,20 +8,29 @@
     padding: 4px;
 }
 
-.dashboard-header {
+.dashboard.header {
+    background: inherit;
     text-align: center;
 }
 
-.dashboard-content {
+.dashboard.blocksContainer {
     display: flex;
     justify-items: baseline;
     justify-content: center;
     flex-wrap: wrap;
+    background: inherit;
 }
 
-.dashboard-inner-block {
+.dashboard.innerBlock {
+    display: flex;
+    flex-direction: column;
     background: var(--themeSecondLayerBlocksColor);
     border-radius: 8px;
     padding: 12px;
     margin: 8px;
+}
+
+.dashboard.innerBlockLabel {
+    padding: 2px 0 2px;
+    text-align: center;
 }

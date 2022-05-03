@@ -3,15 +3,21 @@ window.onstorage = event => {
     localStorage.setItem(event.key, event.oldValue);
 };
 
+setInterval(function() {
+    let date = new Date();
+    if (localStorage.getItem("changeTheme") === "auto") (date.getHours() >= 19 && date.getHours() <= 5) ? changeTheme("black") : changeTheme("white");
+}, 60000);
+
 let requests = setInterval(function() {
     if (localStorage.getItem("nowPage") === "dashboard") updateStatistics();
 }, 1000);
 
 function initLocalStorage() {
     if (localStorage.getItem("firstLoad") === null) {
-        localStorage.setItem("firstLoad", "no");
+        localStorage.setItem("firstLoad", "0");
         localStorage.setItem("nowTheme", "black");
         localStorage.setItem("nowPage", "dashboard");
+        localStorage.setItem("changeTheme", "auto");
     }
     changeTheme(localStorage.getItem("nowTheme"));
 }
@@ -25,6 +31,9 @@ function updateStatistics() {
             showNotify("default", "Возникла ошибка при обработке запроса, попробуйте перезагрузить страницу");
             clearInterval(requests);
         }
+
+        console.log(dataDashboard.data);
+
         // memory info
         document.getElementById("totalMemoryValue").innerHTML = formatBytes(dataDashboard.data.mem.total);
         document.getElementById("usageMemoryValue").innerHTML = formatBytes(dataDashboard.data.mem.total - dataDashboard.data.mem.free);

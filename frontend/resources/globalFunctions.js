@@ -1,4 +1,4 @@
-let pageBackground = document.querySelector('.page-background');
+let pageBackground = document.querySelector('.background');
 
 function formatBytes(bytes, decimals = 2) {
     if (bytes === 0) return '0 байт';
@@ -14,20 +14,25 @@ function showNotify(type, content) {
 
     let windowTemplate = document.querySelector('#specialTemplate-window').content.cloneNode(true);
 
+    windowTemplate.querySelector('.window.content').innerHTML = content;
+
     switch (type) {
         case "default":
             windowTemplate.querySelector('#titleWindow').innerHTML = "Уведомление";
             break;
 
         case "task-viewer":
-            windowTemplate.querySelector('#titleWindow').innerHTML = "Просмотр выполнения задачи";
+            let div = document.createElement('div');
+            div.classList.add("window", "footer", "loader");
+
+            windowTemplate.querySelector('#titleWindow').innerHTML = "Задача";
+            windowTemplate.querySelector('.window').appendChild(div);
             break;
 
         default:
             windowTemplate.querySelector('#titleWindow').innerHTML = "Уведомление неизвестного типа";
     }
 
-    windowTemplate.querySelector('#contentWindow').innerHTML = content;
     windowTemplate.querySelector('.window').classList.add('active');
 
     pageBackground.append(windowTemplate);
@@ -42,17 +47,17 @@ function setContent(page) {
     if (document.getElementById("template-"+page) === null) {
         showNotify('default', "Неизвестная страница");
     } else {
-        document.querySelector(".content").innerHTML = '';
+        document.querySelector(".mainView.content").innerHTML = '';
         localStorage.setItem("nowPage", page);
-        document.querySelector(".content").append(document.querySelector('#template-'+page).content.cloneNode(true));
+        document.querySelector(".mainView.content").append(document.querySelector('#template-'+page).content.cloneNode(true));
     }
 }
 
 function changeTheme(toTheme) {
     /*
      * 1st layer - backgrounds
-     * 2st layer - any active blocks and contents of him
-     * 3st layer - panels (header, footer, etc.)
+     * 2nd layer - any active blocks and contents of him
+     * 3rd layer - panels (header, footer, etc.)
      * 4st layer - special window (notifications, etc.)
      */
     if (toTheme === null) {
@@ -67,12 +72,13 @@ function changeTheme(toTheme) {
 
     if (toTheme === "white") {
         localStorage.setItem("nowTheme", "white");
-        document.documentElement.style.setProperty('--themeFirstLayerColor', '#B4B4B4');
+        document.documentElement.style.setProperty('--themeFirstLayerColor', '#AEAEAE');
         document.documentElement.style.setProperty('--themeSecondLayerColor', '#B8B8B8');
         document.documentElement.style.setProperty('--themeSecondLayerBlocksColor', '#BCBCBC');
         document.documentElement.style.setProperty('--themeSecondLayerBlocksFieldColor', '#C0C0C0');
-        document.documentElement.style.setProperty('--themeThirdLayerColor', '#AEAEAE');
+        document.documentElement.style.setProperty('--themeThirdLayerColor', '#B4B4B4');
         document.documentElement.style.setProperty('--themeFourthLayerColor', '#B2B2B2');
+        document.documentElement.style.setProperty('--themeFourthLayerColorShadow', '#B6B6B6');
         document.documentElement.style.setProperty('--themeTextColor', '#000000');
     } else {
         localStorage.setItem("nowTheme", "black");
@@ -82,6 +88,32 @@ function changeTheme(toTheme) {
         document.documentElement.style.setProperty('--themeSecondLayerBlocksFieldColor', '#323232');
         document.documentElement.style.setProperty('--themeThirdLayerColor', '#202020');
         document.documentElement.style.setProperty('--themeFourthLayerColor', '#242424');
+        document.documentElement.style.setProperty('--themeFourthLayerColorShadow', '#2C2C2C');
         document.documentElement.style.setProperty('--themeTextColor', '#FFFFFF');
     }
+}
+
+function createList(inputElementId, idElement, list) {
+    if (document.querySelector('#' + idElement).querySelector('.droppedList') !== null) return;
+    let listTemplate = document.querySelector('#specialTemplate-droppedList').content.cloneNode(true);
+    for (let i = 0; i < list.length; i++) {
+        let div = document.createElement('div');
+        div.classList.add("button", "text", "listElement");
+        div.dataset.key = list[i][0];
+        div.dataset.value = list[i][1];
+        div.dataset.inputElementId = inputElementId;
+        div.onclick = pickElement
+        div.innerHTML = list[i][1];
+        listTemplate.querySelector('.droppedList.content').appendChild(div);
+    }
+    document.querySelector('#' + idElement).appendChild(listTemplate);
+}
+
+function pickElement() {
+    document.getElementById(this.dataset.inputElementId).dataset.value = this.dataset.key;
+}
+
+function removeList(parentElement, idElement) {
+    if (document.querySelector('#' + idElement) == null) return;
+    document.querySelector('#'+parentElement).querySelector("#"+idElement).remove();
 }
