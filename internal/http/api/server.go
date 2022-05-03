@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/labi-le/control-panel/internal"
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 	"github.com/sirupsen/logrus"
 	"net/http"
 )
@@ -27,9 +26,7 @@ func NewServer(router *echo.Echo, config *internal.PanelSettings) *Server {
 
 func (s *Server) ListenAndServe() error {
 	s.configureLogger()
-	s.router.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
-		Format: "${method} ${uri} ${status}\n",
-	}))
+	s.router.Use(s.logMiddleware)
 
 	s.logger.Log(logrus.InfoLevel, "Server configuration:\n", s.PanelSettings.String())
 	s.logger.Log(logrus.InfoLevel, "Rest api started")
@@ -40,6 +37,13 @@ func (s *Server) ListenAndServe() error {
 	}
 
 	return s.Server.ListenAndServe()
+}
+
+func (s *Server) logMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		s.Logger().Info(fmt.Sprintf("%s %s", c.Request().Method, c.Request().URL.Path))
+		return next(c)
+	}
 }
 
 // implement
