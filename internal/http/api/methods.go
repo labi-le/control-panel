@@ -76,9 +76,14 @@ func (m *Methods) GetDashboardInfo(c echo.Context) error {
 		BadRequest(c.Response(), err)
 	}
 
+	mem, err := internal.GetVirtualMemory()
+	if err != nil {
+		BadRequest(c.Response(), err)
+	}
+
 	SuccessResponse(c.Response(), "Dashboard has been retrieved", structures.Dashboard{
 		CPULoad: cpuLoad,
-		Mem:     internal.GetVirtualMemory(),
+		Mem:     mem,
 		IO:      io,
 	})
 

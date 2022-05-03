@@ -3,17 +3,23 @@ package internal
 import (
 	"github.com/labi-le/control-panel/internal/structures"
 	io "github.com/mackerelio/go-osstat/disk"
-	"github.com/pbnjay/memory"
+	"github.com/mackerelio/go-osstat/memory"
 	"github.com/shirou/gopsutil/v3/cpu"
 	"github.com/shirou/gopsutil/v3/disk"
 )
 
 // GetVirtualMemory returns virtual memory info
-func GetVirtualMemory() *structures.Memory {
-	return &structures.Memory{
-		Total: memory.TotalMemory(),
-		Free:  memory.FreeMemory(),
+func GetVirtualMemory() (*structures.Memory, error) {
+	mem, err := memory.Get()
+	if err != nil {
+		return &structures.Memory{}, err
 	}
+
+	return &structures.Memory{
+		Total:     mem.Total,
+		Free:      mem.Free,
+		Available: mem.Available,
+	}, nil
 }
 
 // GetCPUInfo returns cpu info
