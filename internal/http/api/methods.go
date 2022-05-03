@@ -81,7 +81,7 @@ func (m *Methods) GetDashboardInfo(c echo.Context) error {
 		BadRequest(c.Response(), err)
 	}
 
-	SuccessResponse(c.Response(), "Dashboard has been retrieved", structures.Dashboard{
+	SuccessResponse(c.Response(), structures.Dashboard{
 		CPULoad: cpuLoad,
 		Mem:     mem,
 		IO:      io,
@@ -97,7 +97,7 @@ func (m *Methods) getCPUInfo(w http.ResponseWriter, _ *http.Request) {
 		BadRequest(w, err)
 	}
 
-	SuccessResponse(w, "Cpu info has been retrieved", CPUInfo)
+	SuccessResponse(w, CPUInfo)
 }
 
 // GetDiskPartitions returns disk partitions.
@@ -115,7 +115,7 @@ func (m *Methods) GetDiskPartitions(c echo.Context) error {
 		BadRequest(c.Response(), err)
 	}
 
-	SuccessResponse(c.Response(), "Disk partitions has been retrieved", DiskPartitions)
+	SuccessResponse(c.Response(), DiskPartitions)
 	return nil
 }
 
@@ -132,7 +132,7 @@ func (m *Methods) getDiskInfo(c echo.Context) error {
 		BadRequest(c.Response(), err)
 	}
 
-	SuccessResponse(c.Response(), "Disk usage has been retrieved", DiskUsage)
+	SuccessResponse(c.Response(), DiskUsage)
 	return nil
 }
 
@@ -151,7 +151,7 @@ func (m *Methods) getSettings(c echo.Context) error {
 		BadRequest(c.Response(), err)
 	}
 
-	SuccessResponse(c.Response(), "Settings has been retrieved", settings)
+	SuccessResponse(c.Response(), settings)
 	return nil
 }
 
@@ -181,6 +181,6 @@ func (m *Methods) updateSettings(c echo.Context) error {
 		BadRequest(c.Response(), err)
 	}
 
-	SuccessResponse(c.Response(), "Settings has been updated", settings)
+	SuccessResponse(c.Response(), settings)
 	return nil
 }
