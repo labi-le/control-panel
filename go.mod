@@ -5,7 +5,6 @@ go 1.17
 require (
 	github.com/labstack/echo/v4 v4.7.2
 	github.com/mackerelio/go-osstat v0.2.1
-	github.com/pbnjay/memory v0.0.0-20210728143218-7b4eea64cf58
 	github.com/shirou/gopsutil/v3 v3.22.1
 	github.com/sirupsen/logrus v1.8.1
 	github.com/swaggo/echo-swagger v1.3.2
