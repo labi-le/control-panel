@@ -34,3 +34,7 @@ uninstall:
 clean:
 	@echo "Cleaning..."
 	rm -rf $(BUILD_PATH)*
+
+doc:
+	@echo "Generating documentation..."
+	swag init -g internal/http/api/methods.go

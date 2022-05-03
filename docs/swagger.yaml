@@ -1,0 +1,185 @@
+definitions:
+  internal.PanelSettings:
+    properties:
+      addr:
+        type: string
+      debug_level:
+        type: string
+      language:
+        type: string
+      port:
+        type: string
+    type: object
+  structures.CPULoad:
+    properties:
+      load:
+        type: number
+    type: object
+  structures.Dashboard:
+    properties:
+      cpu_load:
+        $ref: '#/definitions/structures.CPULoad'
+      io:
+        $ref: '#/definitions/structures.UsageStat'
+      mem:
+        $ref: '#/definitions/structures.Memory'
+    type: object
+  structures.DashboardParams:
+    properties:
+      path:
+        type: string
+    type: object
+  structures.Memory:
+    properties:
+      free:
+        type: integer
+      total:
+        type: integer
+    type: object
+  structures.PartitionStat:
+    properties:
+      device:
+        type: string
+      fstype:
+        type: string
+      mountpoint:
+        type: string
+      opts:
+        items:
+          type: string
+        type: array
+    type: object
+  structures.Response:
+    properties:
+      data: {}
+      message:
+        type: string
+      success:
+        type: boolean
+      time:
+        type: string
+      version:
+        type: string
+    type: object
+  structures.UsageStat:
+    properties:
+      free:
+        type: integer
+      fstype:
+        type: string
+      inodesFree:
+        type: integer
+      inodesTotal:
+        type: integer
+      inodesUsed:
+        type: integer
+      inodesUsedPercent:
+        type: number
+      path:
+        type: string
+      total:
+        type: integer
+      used:
+        type: integer
+      usedPercent:
+        type: number
+    type: object
+info:
+  contact: {}
+paths:
+  /dashboard:
+    post:
+      consumes:
+      - application/json
+      description: Get system information and state
+      parameters:
+      - description: Dashboard info
+        in: body
+        name: json
+        required: true
+        schema:
+          $ref: '#/definitions/structures.DashboardParams'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Dashboard info
+          schema:
+            $ref: '#/definitions/structures.Dashboard'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/structures.Response'
+      summary: Dashboard info
+      tags:
+      - info
+  /disk_partitions:
+    post:
+      consumes:
+      - application/json
+      description: Get disk partitions
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Disk partitions
+          schema:
+            items:
+              $ref: '#/definitions/structures.PartitionStat'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/structures.Response'
+      summary: Disk partitions
+      tags:
+      - info
+  /settings:
+    post:
+      consumes:
+      - application/json
+      description: Get settings
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Settings
+          schema:
+            $ref: '#/definitions/internal.PanelSettings'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/structures.Response'
+      summary: Get settings
+      tags:
+      - settings
+    put:
+      consumes:
+      - application/json
+      description: Update settings
+      parameters:
+      - description: Settings
+        in: body
+        name: json
+        required: true
+        schema:
+          $ref: '#/definitions/internal.PanelSettings'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Settings
+          schema:
+            $ref: '#/definitions/internal.PanelSettings'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/structures.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/structures.Response'
+      summary: Update settings
+      tags:
+      - settings
+swagger: "2.0"
