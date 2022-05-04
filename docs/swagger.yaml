@@ -3,9 +3,9 @@ definitions:
     properties:
       addr:
         type: string
-      debug_level:
-        type: string
       language:
+        type: string
+      log_level:
         type: string
       port:
         type: string
@@ -31,9 +31,13 @@ definitions:
     type: object
   structures.Memory:
     properties:
+      cached:
+        type: integer
       free:
         type: integer
       total:
+        type: integer
+      used:
         type: integer
     type: object
   structures.PartitionStat:
@@ -53,12 +57,6 @@ definitions:
     properties:
       data: {}
       message:
-        type: string
-      success:
-        type: boolean
-      time:
-        type: string
-      version:
         type: string
     type: object
   structures.UsageStat:

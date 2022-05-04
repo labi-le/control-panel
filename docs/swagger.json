@@ -157,10 +157,10 @@
                 "addr": {
                     "type": "string"
                 },
-                "debug_level": {
+                "language": {
                     "type": "string"
                 },
-                "language": {
+                "log_level": {
                     "type": "string"
                 },
                 "port": {
@@ -201,10 +201,16 @@
         "structures.Memory": {
             "type": "object",
             "properties": {
+                "cached": {
+                    "type": "integer"
+                },
                 "free": {
                     "type": "integer"
                 },
                 "total": {
+                    "type": "integer"
+                },
+                "used": {
                     "type": "integer"
                 }
             }
@@ -234,15 +240,6 @@
             "properties": {
                 "data": {},
                 "message": {
-                    "type": "string"
-                },
-                "success": {
-                    "type": "boolean"
-                },
-                "time": {
-                    "type": "string"
-                },
-                "version": {
                     "type": "string"
                 }
             }

@@ -37,4 +37,4 @@ clean:
 
 doc:
 	@echo "Generating documentation..."
-	swag init -g internal/http/api/methods.go
+	swag init -g internal/http/api/methods.go --parseDependency --parseInternal --parseDepth 1

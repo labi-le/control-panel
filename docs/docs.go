@@ -176,10 +176,10 @@ var doc = `{
                 "addr": {
                     "type": "string"
                 },
-                "debug_level": {
+                "language": {
                     "type": "string"
                 },
-                "language": {
+                "log_level": {
                     "type": "string"
                 },
                 "port": {
@@ -220,10 +220,16 @@ var doc = `{
         "structures.Memory": {
             "type": "object",
             "properties": {
+                "cached": {
+                    "type": "integer"
+                },
                 "free": {
                     "type": "integer"
                 },
                 "total": {
+                    "type": "integer"
+                },
+                "used": {
                     "type": "integer"
                 }
             }
@@ -253,15 +259,6 @@ var doc = `{
             "properties": {
                 "data": {},
                 "message": {
-                    "type": "string"
-                },
-                "success": {
-                    "type": "boolean"
-                },
-                "time": {
-                    "type": "string"
-                },
-                "version": {
                     "type": "string"
                 }
             }
