@@ -21,15 +21,19 @@ func (s *Server) Logger() *logrus.Logger {
 }
 
 func NewServer(router *echo.Echo, config *internal.PanelSettings) *Server {
-	return &Server{router: router, logger: logrus.New(), PanelSettings: config}
+	srv := &Server{router: router, logger: logrus.New(), PanelSettings: config}
+	srv.configureLogger()
+
+	return srv
 }
 
 func (s *Server) ListenAndServe() error {
-	s.configureLogger()
 	s.router.Use(s.logMiddleware)
 
-	s.logger.Log(logrus.InfoLevel, "Server configuration:\n", s.PanelSettings.String())
-	s.logger.Log(logrus.InfoLevel, "Rest api started")
+	// todo add https support
+	//goland:noinspection HttpUrlsUsage
+	s.Logger().Infof("Panel is available at http://%s:%s", s.PanelSettings.Addr, s.PanelSettings.Port)
+	s.Logger().Log(logrus.InfoLevel, "Rest api started")
 
 	s.Server = &http.Server{
 		Handler: s,
