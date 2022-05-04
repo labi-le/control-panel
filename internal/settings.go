@@ -29,7 +29,7 @@ const (
 type PanelSettings struct {
 	Addr     string `json:"addr"`
 	Port     string `json:"port"`
-	LogLevel string `json:"debug_level"`
+	LogLevel string `json:"log_level"`
 	Language string `json:"language"`
 
 	dbConn *gorm.DB
@@ -80,9 +80,9 @@ func DefaultPanelSettings() *PanelSettings {
 // GetSettings returns the settings
 // if the settings are not found, it will save and return default settings
 func (p *PanelSettings) GetSettings() (*PanelSettings, error) {
-	var settings *PanelSettings
+	var settings = DefaultPanelSettings()
 	if err := p.dbConn.FirstOrCreate(settings).Error; err != nil {
-		settings = DefaultPanelSettings()
+		return nil, err
 	}
 
 	return settings, nil
