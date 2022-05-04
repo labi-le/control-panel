@@ -33,9 +33,10 @@ function updateStatistics() {
         }
 
         // memory info
-        document.getElementById("totalMemoryValue").innerHTML = formatBytes(dataDashboard.mem.total);
-        document.getElementById("usageMemoryValue").innerHTML = formatBytes(dataDashboard.mem.total - dataDashboard.mem.free);
-        document.getElementById("freeMemoryValue").innerHTML = formatBytes(dataDashboard.mem.free);
+        document.getElementById("totalMemVal").innerHTML = formatBytes(dataDashboard.mem.total);
+        document.getElementById("usedMemVal").innerHTML = formatBytes(dataDashboard.mem.used);
+        document.getElementById("freeMemVal").innerHTML = formatBytes(dataDashboard.mem.free);
+        document.getElementById("cachedMemVal").innerHTML = formatBytes(dataDashboard.mem.cached);
         // CPU info
         document.getElementById("cpuLoadValue").innerHTML = parseFloat(dataDashboard.cpu_load.load).toFixed(2) + "%";
         // disk info
