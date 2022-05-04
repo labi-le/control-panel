@@ -6,11 +6,8 @@ import (
 	"github.com/labi-le/control-panel/internal"
 	"github.com/labi-le/control-panel/internal/structures"
 	"github.com/labstack/echo/v4"
-	echoSwagger "github.com/swaggo/echo-swagger"
 	"io/ioutil"
 	"net/http"
-
-	_ "github.com/labi-le/control-panel/docs"
 )
 
 type Methods struct {
@@ -28,8 +25,6 @@ func (m *Methods) GetRoutes() *echo.Echo {
 	e.Router().Add(http.MethodGet, "/", func(c echo.Context) error {
 		return c.File("./frontend/index.html")
 	})
-
-	e.Router().Add(http.MethodGet, "/swagger/*", echoSwagger.WrapHandler)
 
 	e.Router().Add(http.MethodGet, "/api/settings", m.getSettings)
 	e.Router().Add(http.MethodPut, "/api/settings", m.updateSettings)

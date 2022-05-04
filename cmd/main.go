@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/labi-le/control-panel/internal"
 	"github.com/labi-le/control-panel/internal/http/api"
+	"github.com/labi-le/control-panel/pkg"
 	"log"
 	"net/http"
 	"os"
@@ -47,7 +48,7 @@ func main() {
 	}
 
 	apiResolver := api.NewMethods(conf)
-	srv := api.NewServer(apiResolver.GetRoutes(), conf)
+	srv := pkg.NewServer(apiResolver.GetRoutes(), conf)
 
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
