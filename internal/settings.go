@@ -22,9 +22,9 @@ const (
 )
 
 // PanelSettings
-// Port - the port on which the panel will work
-// LogLevel - the debug level of the panel
-// Language - panel language
+// port - the port on which the panel will work
+// logLevel - the debug level of the panel
+// language - panel language
 // Theme - panel theme
 type PanelSettings struct {
 	Addr     string `json:"addr"`
@@ -33,6 +33,22 @@ type PanelSettings struct {
 	Language string `json:"language"`
 
 	dbConn *gorm.DB
+}
+
+func (p *PanelSettings) GetAddr() string {
+	return p.Addr
+}
+
+func (p *PanelSettings) GetPort() string {
+	return p.Port
+}
+
+func (p *PanelSettings) GetLogLevel() string {
+	return p.LogLevel
+}
+
+func (p *PanelSettings) GetLanguage() string {
+	return p.Language
 }
 
 func NewPanelSettings(settingsPath string) (*PanelSettings, error) {

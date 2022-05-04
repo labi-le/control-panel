@@ -1,8 +1,7 @@
-package api
+package pkg
 
 import (
 	"fmt"
-	"github.com/labi-le/control-panel/internal"
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
 	"net/http"
@@ -12,7 +11,7 @@ type Server struct {
 	router *echo.Echo
 	logger *logrus.Logger
 
-	PanelSettings *internal.PanelSettings
+	PanelSettings ConfigInterface
 	*http.Server
 }
 
@@ -20,7 +19,7 @@ func (s *Server) Logger() *logrus.Logger {
 	return s.logger
 }
 
-func NewServer(router *echo.Echo, config *internal.PanelSettings) *Server {
+func NewServer(router *echo.Echo, config ConfigInterface) *Server {
 	srv := &Server{router: router, logger: logrus.New(), PanelSettings: config}
 	srv.configureLogger()
 
@@ -32,12 +31,12 @@ func (s *Server) ListenAndServe() error {
 
 	// todo add https support
 	//goland:noinspection HttpUrlsUsage
-	s.Logger().Infof("Panel is available at http://%s:%s", s.PanelSettings.Addr, s.PanelSettings.Port)
+	s.Logger().Infof("Panel is available at http://%s:%s", s.PanelSettings.GetAddr(), s.PanelSettings.GetPort())
 	s.Logger().Log(logrus.InfoLevel, "Rest api started")
 
 	s.Server = &http.Server{
 		Handler: s,
-		Addr:    fmt.Sprintf("%s:%s", s.PanelSettings.Addr, s.PanelSettings.Port),
+		Addr:    fmt.Sprintf("%s:%s", s.PanelSettings.GetAddr(), s.PanelSettings.GetPort()),
 	}
 
 	return s.Server.ListenAndServe()
@@ -56,7 +55,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) configureLogger() {
-	level, err := logrus.ParseLevel(s.PanelSettings.LogLevel)
+	level, err := logrus.ParseLevel(s.PanelSettings.GetLogLevel())
 	if err != nil {
 		panic("invalid log level")
 	}
