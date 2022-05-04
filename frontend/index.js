@@ -32,22 +32,20 @@ function updateStatistics() {
             clearInterval(requests);
         }
 
-        console.log(dataDashboard.data);
-
         // memory info
-        document.getElementById("totalMemoryValue").innerHTML = formatBytes(dataDashboard.data.mem.total);
-        document.getElementById("usageMemoryValue").innerHTML = formatBytes(dataDashboard.data.mem.total - dataDashboard.data.mem.free);
-        document.getElementById("freeMemoryValue").innerHTML = formatBytes(dataDashboard.data.mem.free);
+        document.getElementById("totalMemoryValue").innerHTML = formatBytes(dataDashboard.mem.total);
+        document.getElementById("usageMemoryValue").innerHTML = formatBytes(dataDashboard.mem.total - dataDashboard.mem.free);
+        document.getElementById("freeMemoryValue").innerHTML = formatBytes(dataDashboard.mem.free);
         // CPU info
-        document.getElementById("cpuLoadValue").innerHTML = parseFloat(dataDashboard.data.cpu_load.load).toFixed(2) + "%";
+        document.getElementById("cpuLoadValue").innerHTML = parseFloat(dataDashboard.cpu_load.load).toFixed(2) + "%";
         // disk info
-        document.getElementById("partitionType").innerHTML = "- Тип раздела ('" + dataDashboard.data.io.path + "'): " + dataDashboard.data.io.fstype;
-        document.getElementById("totalDiskSizeValue").innerHTML = "-- Всего: " + formatBytes(dataDashboard.data.io.total);
-        document.getElementById("freeDiskSizeValue").innerHTML = "-- Свободно: " + formatBytes(dataDashboard.data.io.free);
-        document.getElementById("usedDiskSizeValue").innerHTML = "-- Используется: " + formatBytes(dataDashboard.data.io.used);
-        document.getElementById("usedDiskSizeInPercentValue").innerHTML = "-- Используется (%): " + parseFloat(dataDashboard.data.io.usedPercent).toFixed(2) + "%";
+        document.getElementById("partitionType").innerHTML = "- Тип раздела ('" + dataDashboard.io.path + "'): " + dataDashboard.io.fstype;
+        document.getElementById("totalDiskSizeValue").innerHTML = "-- Всего: " + formatBytes(dataDashboard.io.total);
+        document.getElementById("freeDiskSizeValue").innerHTML = "-- Свободно: " + formatBytes(dataDashboard.io.free);
+        document.getElementById("usedDiskSizeValue").innerHTML = "-- Используется: " + formatBytes(dataDashboard.io.used);
+        document.getElementById("usedDiskSizeInPercentValue").innerHTML = "-- Используется (%): " + parseFloat(dataDashboard.io.usedPercent).toFixed(2) + "%";
         // update api/panel version
-        document.getElementById("footer-version").innerHTML = "v" + dataDashboard.version;
+        document.getElementById("footer-version").innerHTML = "v" + requestDashboard.getResponseHeader("Version");
     };
     requestDashboard.onerror = function () {
         showNotify("default", "Возникла ошибка при обработке запроса, попробуйте перезагрузить страницу");
