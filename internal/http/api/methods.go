@@ -91,13 +91,13 @@ func (m *Methods) GetDashboardInfo(c echo.Context) error {
 }
 
 // getCPUInfo returns cpu statistics.
-func (m *Methods) getCPUInfo(w http.ResponseWriter, _ *http.Request) {
+func (m *Methods) getCPUInfo(c echo.Context) {
 	CPUInfo, err := internal.GetCPUInfo()
 	if err != nil {
-		BadRequest(w, err)
+		BadRequest(c.Response(), err)
 	}
 
-	SuccessResponse(w, CPUInfo)
+	SuccessResponse(c.Response(), CPUInfo)
 }
 
 // GetDiskPartitions returns disk partitions.
