@@ -41,7 +41,7 @@ func (s *Server) ListenAndServe() error {
 
 func (s *Server) logMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		s.Logger().Info(fmt.Sprintf("%s %s", c.Request().Method, c.Request().URL.Path))
+		s.Logger().Info(fmt.Sprintf("%s %s %d", c.Request().Method, c.Request().URL.Path, c.Response().Status))
 		return next(c)
 	}
 }

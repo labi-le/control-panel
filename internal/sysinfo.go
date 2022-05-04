@@ -16,9 +16,10 @@ func GetVirtualMemory() (*structures.Memory, error) {
 	}
 
 	return &structures.Memory{
-		Total:     mem.Total,
-		Free:      mem.Free,
-		Available: mem.Available,
+		Total:  mem.Total,
+		Free:   mem.Free,
+		Used:   mem.Used,
+		Cached: mem.Cached,
 	}, nil
 }
 
