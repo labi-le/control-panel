@@ -2,20 +2,46 @@ package api
 
 import (
 	"encoding/json"
-	"errors"
 	"github.com/labi-le/control-panel/internal"
 	"github.com/labi-le/control-panel/internal/structures"
 	"github.com/labstack/echo/v4"
+	"github.com/sirupsen/logrus"
+	"golang.org/x/net/websocket"
 	"io/ioutil"
 	"net/http"
+	"time"
 )
 
 type Methods struct {
 	Settings *internal.PanelSettings
+	logger   *logrus.Logger
 }
 
-func NewMethods(s *internal.PanelSettings) *Methods {
-	return &Methods{Settings: s}
+func (m *Methods) Logger() *logrus.Logger {
+	return m.logger
+}
+
+func (m *Methods) successResponse(ws *websocket.Conn, d ...any) {
+	if err := websocket.JSON.Send(ws, d); err != nil {
+		m.Logger().Error(err)
+	}
+
+	return
+}
+
+func (m *Methods) badResponse(ws *websocket.Conn, err error) {
+	r := structures.Response{
+		Message: err.Error(),
+		Data:    []string{},
+	}
+	m.Logger().Error(err)
+
+	m.successResponse(ws, r)
+	return
+}
+
+func NewMethods(s *internal.PanelSettings, l *logrus.Logger) *Methods {
+	return &Methods{Settings: s, logger: l}
 }
 
 func (m *Methods) GetRoutes() *echo.Echo {
@@ -26,156 +52,107 @@ func (m *Methods) GetRoutes() *echo.Echo {
 		return c.File("./frontend/index.html")
 	})
 
-	e.Router().Add(http.MethodGet, "/api/settings", m.getSettings)
-	e.Router().Add(http.MethodPut, "/api/settings", m.updateSettings)
-	e.Router().Add(http.MethodPost, "/api/dashboard", m.GetDashboardInfo)
-	e.Router().Add(http.MethodPost, "/api/disk_partitions", m.GetDiskPartitions)
-
-	// web interface
-	// api put\post data
-	//// dashboard
-	//// api get data
-	//r.HandleFunc("/api/disk_partitions", m.GetDiskPartitions).Methods(http.MethodPost)
+	e.Router().Add(http.MethodGet, "/ws/settings", m.getSettings)
+	e.Router().Add(http.MethodPut, "/ws/settings", m.updateSettings)
+	e.Router().Add(http.MethodGet, "/ws/dashboard", m.GetDashboardInfo)
+	e.Router().Add(http.MethodGet, "/ws/disk_partitions", m.GetDiskPartitions)
 
 	return e
 }
 
-// GetDashboardInfo the method that will display statistics in the dashboard will call cpu_load, disk, mem, etc...
-// @Summary      Dashboard info
-// @Description  Get system information and state
-// @Tags         info
-// @Accept       json
-// @Produce      json
-// @Param        json  body      structures.DashboardParams  true  "Dashboard info"
-// @Success      200   {object}  structures.Dashboard        "Dashboard info"
-// @Failure      500  {object}  structures.Response
-// @Router       /dashboard [post]
 func (m *Methods) GetDashboardInfo(c echo.Context) error {
-	data, err := ioutil.ReadAll(c.Request().Body)
-	if err != nil {
-		BadRequest(c.Response(), err)
-	}
+	websocket.Handler(func(ws *websocket.Conn) {
+		defer ws.Close()
 
-	var dashboard structures.DashboardParams
-	if err := json.Unmarshal(data, &dashboard); err != nil {
-		BadRequest(c.Response(), err)
-	}
+		var dashboard structures.DashboardParams
+		err := websocket.JSON.Receive(ws, &dashboard)
+		if err != nil {
+			if _, err := ws.Write([]byte("Invalid request")); err != nil {
+				m.Logger().Error(err)
+			}
+		}
 
-	cpuLoad, err := internal.GetCPULoad()
-	if err != nil {
-		BadRequest(c.Response(), err)
-	}
+		for {
+			cpuLoad, err := internal.GetCPULoad()
+			io, err := internal.GetDiskInfo(dashboard.Path)
+			mem, err := internal.GetVirtualMemory()
 
-	io, err := internal.GetDiskInfo(dashboard.Path)
-	if err != nil {
-		BadRequest(c.Response(), err)
-	}
+			resp := structures.Dashboard{
+				CPULoad: cpuLoad,
+				Mem:     mem,
+				IO:      io,
+			}
 
-	mem, err := internal.GetVirtualMemory()
-	if err != nil {
-		BadRequest(c.Response(), err)
-	}
+			if err != nil {
+				m.badResponse(ws, err)
+				m.Logger().Error(err)
+				return
+			}
 
-	SuccessResponse(c.Response(), structures.Dashboard{
-		CPULoad: cpuLoad,
-		Mem:     mem,
-		IO:      io,
-	})
+			m.successResponse(ws, resp)
+
+			time.Sleep(time.Second)
+		}
+	}).ServeHTTP(c.Response(), c.Request())
 
 	return nil
 }
 
-// getCPUInfo returns cpu statistics.
-func (m *Methods) getCPUInfo(c echo.Context) {
-	CPUInfo, err := internal.GetCPUInfo()
-	if err != nil {
-		BadRequest(c.Response(), err)
-	}
-
-	SuccessResponse(c.Response(), CPUInfo)
-}
-
-// GetDiskPartitions returns disk partitions.
-// @Summary      Disk partitions
-// @Description  Get disk partitions
-// @Tags         info
-// @Accept       json
-// @Produce      json
-// @Success      200  {object}  []structures.PartitionStat  "Disk partitions"
-// @Failure      500  {object}  structures.Response
-// @Router       /disk_partitions [post]
 func (m *Methods) GetDiskPartitions(c echo.Context) error {
-	DiskPartitions, err := internal.GetDiskPartitions()
-	if err != nil {
-		BadRequest(c.Response(), err)
-	}
+	websocket.Handler(func(ws *websocket.Conn) {
+		defer ws.Close()
 
-	SuccessResponse(c.Response(), DiskPartitions)
+		DiskPartitions, err := internal.GetDiskPartitions()
+		if err != nil {
+			m.badResponse(ws, err)
+			m.Logger().Error(err)
+			return
+		}
+
+		m.successResponse(ws, DiskPartitions)
+
+	}).ServeHTTP(c.Response(), c.Request())
+
 	return nil
 }
 
-// getDiskInfo returns disk usage statistics.
-func (m *Methods) getDiskInfo(c echo.Context) error {
-	// get var from request
-	path := c.QueryParam("path")
-	if path == "" {
-		BadRequest(c.Response(), errors.New("param path is empty"))
-	}
-
-	DiskUsage, err := internal.GetDiskInfo(path)
-	if err != nil {
-		BadRequest(c.Response(), err)
-	}
-
-	SuccessResponse(c.Response(), DiskUsage)
-	return nil
-}
-
-// getSettings
-// @Summary      Get settings
-// @Description  Get settings
-// @Tags         settings
-// @Accept       json
-// @Produce      json
-// @Success      200  {object}  internal.PanelSettings  "Settings"
-// @Failure      500   {object}  structures.Response
-// @Router       /settings [post]
 func (m *Methods) getSettings(c echo.Context) error {
-	settings, err := m.Settings.GetSettings()
-	if err != nil {
-		BadRequest(c.Response(), err)
-	}
+	websocket.Handler(func(ws *websocket.Conn) {
+		settings, err := m.Settings.GetSettings()
+		if err != nil {
+			m.badResponse(ws, err)
+			m.Logger().Error(err)
+			return
+		}
 
-	SuccessResponse(c.Response(), settings)
+		m.successResponse(ws, settings)
+	}).ServeHTTP(c.Response(), c.Request())
+
 	return nil
 }
 
-// updateSettings
-// @Summary      Update settings
-// @Description  Update settings
-// @Tags         settings
-// @Accept       json
-// @Produce      json
-// @Param        json  body      internal.PanelSettings  true  "Settings"
-// @Success      200   {object}  internal.PanelSettings  "Settings"
-// @Failure      400   {object}  structures.Response
-// @Failure      500   {object}  structures.Response
-// @Router       /settings [put]
 func (m *Methods) updateSettings(c echo.Context) error {
-	var settings internal.PanelSettings
+	websocket.Handler(func(ws *websocket.Conn) {
+		var settings internal.PanelSettings
 
-	body, _ := ioutil.ReadAll(c.Request().Body)
-	err := json.Unmarshal(body, &settings)
-	if err != nil {
-		BadRequest(c.Response(), err)
+		body, _ := ioutil.ReadAll(c.Request().Body)
+		err := json.Unmarshal(body, &settings)
+		if err != nil {
+			m.badResponse(ws, err)
+			m.Logger().Error(err)
+			return
+		}
 
-	}
+		err = m.Settings.UpdateSettings(settings)
+		if err != nil {
+			m.badResponse(ws, err)
+			m.Logger().Error(err)
+			return
+		}
 
-	err = m.Settings.UpdateSettings(settings)
-	if err != nil {
-		BadRequest(c.Response(), err)
-	}
+		m.successResponse(ws, settings)
 
-	SuccessResponse(c.Response(), settings)
+	}).ServeHTTP(c.Response(), c.Request())
+
 	return nil
 }
