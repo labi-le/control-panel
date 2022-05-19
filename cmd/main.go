@@ -7,6 +7,7 @@ import (
 	"github.com/labi-le/control-panel/internal"
 	"github.com/labi-le/control-panel/internal/http/api"
 	"github.com/labi-le/control-panel/pkg"
+	"github.com/sirupsen/logrus"
 	"log"
 	"net/http"
 	"os"
@@ -24,16 +25,6 @@ func init() {
 	flag.BoolVar(&versionFlag, "version", false, "print version and exit")
 }
 
-// @title          Control Panel API
-// @version        1.0
-// @description    Control Panel API
-// @contact.name   Control Panel API Support
-// @contact.url    https://github.com/labi-le/control-panel
-// @contact.email  https://github.com/labi-le/control-panel/issues
-// @license.name   GNU General Public License v3.0
-// @license.url    https://www.gnu.org/licenses/gpl-3.0.html
-// @host           localhost:8080
-// @BasePath       /api
 func main() {
 	flag.Parse()
 
@@ -47,8 +38,16 @@ func main() {
 		log.Fatal(err)
 	}
 
-	apiResolver := api.NewMethods(conf)
-	srv := pkg.NewServer(apiResolver.GetRoutes(), conf)
+	level, err := logrus.ParseLevel(conf.GetLogLevel())
+	if err != nil {
+		panic("invalid log level")
+	}
+
+	logger := logrus.New()
+	logger.SetLevel(level)
+
+	apiResolver := api.NewMethods(conf, logger)
+	srv := pkg.NewServer(apiResolver.GetRoutes(), conf, logger)
 
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {

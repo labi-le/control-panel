@@ -19,9 +19,8 @@ func (s *Server) Logger() *logrus.Logger {
 	return s.logger
 }
 
-func NewServer(router *echo.Echo, config ConfigInterface) *Server {
-	srv := &Server{router: router, logger: logrus.New(), PanelSettings: config}
-	srv.configureLogger()
+func NewServer(router *echo.Echo, config ConfigInterface, logger *logrus.Logger) *Server {
+	srv := &Server{router: router, logger: logger, PanelSettings: config}
 
 	return srv
 }
@@ -52,13 +51,4 @@ func (s *Server) logMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 // implement
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.router.ServeHTTP(w, r)
-}
-
-func (s *Server) configureLogger() {
-	level, err := logrus.ParseLevel(s.PanelSettings.GetLogLevel())
-	if err != nil {
-		panic("invalid log level")
-	}
-
-	s.logger.SetLevel(level)
 }
