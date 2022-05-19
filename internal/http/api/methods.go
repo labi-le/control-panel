@@ -22,6 +22,10 @@ func (m *Methods) Logger() *logrus.Logger {
 }
 
 func (m *Methods) successResponse(ws *websocket.Conn, d ...any) {
+	ws.Request().Header.Set("Content-Type", "application/json")
+	ws.Request().Header.Set("Version", internal.PanelVersion)
+	ws.Request().Header.Set("Date", time.Now().Format(time.RFC3339Nano))
+
 	if err := websocket.JSON.Send(ws, d); err != nil {
 		m.Logger().Error(err)
 	}
