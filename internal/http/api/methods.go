@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
 	"github.com/labi-le/control-panel/internal"
 	"github.com/labi-le/control-panel/internal/structures"
 	"github.com/labstack/echo/v4"
@@ -9,6 +10,7 @@ import (
 	"golang.org/x/net/websocket"
 	"io/ioutil"
 	"net/http"
+	"syscall"
 	"time"
 )
 
@@ -21,27 +23,30 @@ func (m *Methods) Logger() *logrus.Logger {
 	return m.logger
 }
 
-func (m *Methods) successResponse(ws *websocket.Conn, d ...any) {
-	ws.Request().Header.Set("Content-Type", "application/json")
-	ws.Request().Header.Set("Version", internal.PanelVersion)
-	ws.Request().Header.Set("Date", time.Now().Format(time.RFC3339Nano))
-
-	if err := websocket.JSON.Send(ws, d); err != nil {
+func (m *Methods) successResponse(ws *websocket.Conn, d ...any) bool {
+	err := websocket.JSON.Send(ws, d)
+	if err != nil {
+		if errors.Is(err, syscall.EPIPE) {
+			m.Logger().Infof("Client disconnected %s", ws.Request().RemoteAddr)
+			return false
+		}
 		m.Logger().Error(err)
+
+		return false
+
 	}
 
-	return
+	return true
 }
 
-func (m *Methods) badResponse(ws *websocket.Conn, err error) {
+func (m *Methods) badResponse(ws *websocket.Conn, err error) bool {
 	r := structures.Response{
 		Message: err.Error(),
 		Data:    []string{},
 	}
 	m.Logger().Error(err)
 
-	m.successResponse(ws, r)
-	return
+	return m.successResponse(ws, r)
 }
 
 func NewMethods(s *internal.PanelSettings, l *logrus.Logger) *Methods {
@@ -53,6 +58,9 @@ func (m *Methods) GetRoutes() *echo.Echo {
 
 	e.Static("/", "./frontend/")
 	e.Router().Add(http.MethodGet, "/", func(c echo.Context) error {
+		c.Response().Header().Set("Version", internal.PanelVersion)
+		c.Response().Header().Set("Date", time.Now().Format(time.RFC3339Nano))
+
 		return c.File("./frontend/index.html")
 	})
 
@@ -67,6 +75,8 @@ func (m *Methods) GetRoutes() *echo.Echo {
 func (m *Methods) GetDashboardInfo(c echo.Context) error {
 	websocket.Handler(func(ws *websocket.Conn) {
 		defer ws.Close()
+
+		m.Logger().Infof("Client connected %s", ws.Request().RemoteAddr)
 
 		var dashboard structures.DashboardParams
 		err := websocket.JSON.Receive(ws, &dashboard)
@@ -89,13 +99,15 @@ func (m *Methods) GetDashboardInfo(c echo.Context) error {
 
 			if err != nil {
 				m.badResponse(ws, err)
-				m.Logger().Error(err)
-				return
+				break
 			}
 
-			m.successResponse(ws, resp)
+			if m.successResponse(ws, resp) == false {
+				break
+			}
 
-			time.Sleep(time.Second)
+			// https://github.com/labi-le/control-panel/projects/1#card-82235433
+			time.Sleep(time.Millisecond * 500)
 		}
 	}).ServeHTTP(c.Response(), c.Request())
 
@@ -109,7 +121,6 @@ func (m *Methods) GetDiskPartitions(c echo.Context) error {
 		DiskPartitions, err := internal.GetDiskPartitions()
 		if err != nil {
 			m.badResponse(ws, err)
-			m.Logger().Error(err)
 			return
 		}
 
@@ -125,7 +136,6 @@ func (m *Methods) getSettings(c echo.Context) error {
 		settings, err := m.Settings.GetSettings()
 		if err != nil {
 			m.badResponse(ws, err)
-			m.Logger().Error(err)
 			return
 		}
 
@@ -143,14 +153,12 @@ func (m *Methods) updateSettings(c echo.Context) error {
 		err := json.Unmarshal(body, &settings)
 		if err != nil {
 			m.badResponse(ws, err)
-			m.Logger().Error(err)
 			return
 		}
 
 		err = m.Settings.UpdateSettings(settings)
 		if err != nil {
 			m.badResponse(ws, err)
-			m.Logger().Error(err)
 			return
 		}
 
