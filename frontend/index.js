@@ -3,9 +3,13 @@ window.onstorage = event => {
     localStorage.setItem(event.key, event.oldValue);
 };
 
-setInterval(function() {
+setInterval(function () {
     let date = new Date();
-    if (localStorage.getItem("changeTheme") === "auto") (date.getHours() >= 19 && date.getHours() <= 5) ? changeTheme("black") : changeTheme("white");
+    if (localStorage.getItem("changeTheme") === "auto")
+        (date.getHours() >= 19 && date.getHours() <= 5)
+            ? changeTheme("black")
+            : changeTheme("white");
+
 }, 60000);
 
 function initLocalStorage() {
@@ -27,10 +31,10 @@ function updateStatistics() {
     webSocket.addEventListener('message', function (event) {
         let dataDashboard = JSON.parse(event.data)[0];
         // memory info
-        document.getElementById("totalMemVal").innerHTML = "Всего: "+formatBytes(dataDashboard.mem.total);
-        document.getElementById("usedMemVal").innerHTML = "Используется: "+formatBytes(dataDashboard.mem.used);
-        document.getElementById("freeMemVal").innerHTML = "Свободно: "+formatBytes(dataDashboard.mem.free);
-        document.getElementById("cachedMemVal").innerHTML = "Кэш: "+formatBytes(dataDashboard.mem.cached);
+        document.getElementById("totalMemVal").innerHTML = "Всего: " + formatBytes(dataDashboard.mem.total);
+        document.getElementById("usedMemVal").innerHTML = "Используется: " + formatBytes(dataDashboard.mem.used);
+        document.getElementById("freeMemVal").innerHTML = "Свободно: " + formatBytes(dataDashboard.mem.free);
+        document.getElementById("cachedMemVal").innerHTML = "Кэш: " + formatBytes(dataDashboard.mem.cached);
         // CPU info
         document.getElementById("cpuLoadValue").innerHTML = parseFloat(dataDashboard.cpu_load.load).toFixed(2) + "%";
         // disk info
