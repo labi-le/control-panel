@@ -1,4 +1,4 @@
-package pkg
+package terminal
 
 import (
 	"log"
@@ -22,7 +22,7 @@ func NewTerminal(title string) *Terminal {
 	}
 }
 
-func (t *Terminal) Exec(name string, arg []string, progress func(b []byte)) error {
+func (t *Terminal) Exec(name string, arg []string, progress func(o *Output)) error {
 	cmd := exec.Command(name, arg...)
 	log.Println(cmd.String())
 	//  both the error output and standard output of the command are connected to the same pipe
@@ -41,7 +41,7 @@ func (t *Terminal) Exec(name string, arg []string, progress func(b []byte)) erro
 		tmp := make([]byte, 1024)
 		_, err := stdout.Read(tmp)
 
-		progress(tmp)
+		progress(NewOutput(tmp))
 
 		if err != nil {
 			break
