@@ -20,10 +20,10 @@ function initLocalStorage() {
 
 function updateStatistics() {
     let webSocket = new WebSocket("ws://" + document.location.hostname + ":" + document.location.port + "/ws/dashboard");
-
     webSocket.addEventListener('open', function (event) {
         webSocket.send(JSON.stringify({"path": "/"}));
     });
+
     webSocket.addEventListener('message', function (event) {
         let dataDashboard = JSON.parse(event.data)[0];
         // memory info
@@ -42,8 +42,9 @@ function updateStatistics() {
         // update api/panel version
         document.getElementById("footer-version").innerHTML = "v1";
     });
+
     webSocket.addEventListener('close', function (event) {
-        showWindow("default", "Возникла ошибка при обработке запроса, попробуйте перезагрузить страницу");
+        showNotify("default", "Возникла ошибка при обработке запроса, попробуйте перезагрузить страницу");
         webSocket.close();
     });
 }
