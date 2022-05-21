@@ -96,12 +96,11 @@ func DefaultPanelSettings() *PanelSettings {
 // GetSettings returns the settings
 // if the settings are not found, it will save and return default settings
 func (p *PanelSettings) GetSettings() (*PanelSettings, error) {
-	var settings = DefaultPanelSettings()
-	if err := p.dbConn.FirstOrCreate(settings).Error; err != nil {
+	if err := p.dbConn.FirstOrCreate(p).Error; err != nil {
 		return nil, err
 	}
 
-	return settings, nil
+	return p, nil
 }
 
 // UpdateSettings updates the settings
