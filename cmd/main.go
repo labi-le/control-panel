@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/labi-le/control-panel/internal"
+	router "github.com/labi-le/control-panel/internal/http"
 	"github.com/labi-le/control-panel/internal/http/api"
 	"github.com/labi-le/control-panel/pkg"
 	"github.com/sirupsen/logrus"
@@ -46,8 +47,8 @@ func main() {
 	logger := logrus.New()
 	logger.SetLevel(level)
 
-	apiResolver := api.NewMethods(conf, logger)
-	srv := pkg.NewServer(apiResolver.GetRoutes(), conf, logger)
+	resolver := api.NewMethods(conf, logger)
+	srv := pkg.NewServer(router.GetRoutes(resolver), conf, logger)
 
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
