@@ -5,6 +5,7 @@ import (
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"os"
+	"time"
 )
 
 var (
@@ -27,10 +28,11 @@ const (
 // language - panel language
 // Theme - panel theme
 type PanelSettings struct {
-	Addr     string `json:"addr"`
-	Port     string `json:"port"`
-	LogLevel string `json:"log_level"`
-	Language string `json:"language"`
+	Addr                   string        `json:"addr"`
+	Port                   string        `json:"port"`
+	LogLevel               string        `json:"log_level"`
+	Language               string        `json:"language"`
+	DashboardUpdateTimeout time.Duration `json:"dashboard_update_timeout"`
 
 	dbConn *gorm.DB
 }
@@ -49,6 +51,10 @@ func (p *PanelSettings) GetLogLevel() string {
 
 func (p *PanelSettings) GetLanguage() string {
 	return p.Language
+}
+
+func (p *PanelSettings) GetDashboardUpdateTimeout() time.Duration {
+	return p.DashboardUpdateTimeout
 }
 
 func NewPanelSettings(settingsPath string) (*PanelSettings, error) {
@@ -86,10 +92,11 @@ func NewPanelSettings(settingsPath string) (*PanelSettings, error) {
 // trace
 func DefaultPanelSettings() *PanelSettings {
 	return &PanelSettings{
-		Addr:     DefaultAddr,
-		Port:     DefaultPort,
-		LogLevel: DefaultLogLevel,
-		Language: DefaultLanguage,
+		Addr:                   DefaultAddr,
+		Port:                   DefaultPort,
+		LogLevel:               DefaultLogLevel,
+		Language:               DefaultLanguage,
+		DashboardUpdateTimeout: time.Second * 1,
 	}
 }
 
