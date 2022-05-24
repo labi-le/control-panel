@@ -16,10 +16,11 @@ var (
 const (
 	PanelVersion = "0.0.1"
 
-	DefaultLanguage = "en"
-	DefaultLogLevel = "debug"
-	DefaultAddr     = "0.0.0.0"
-	DefaultPort     = "7777"
+	DefaultLanguage               = "en"
+	DefaultLogLevel               = "debug"
+	DefaultAddr                   = "0.0.0.0"
+	DefaultPort                   = "7777"
+	DefaultDashboardUpdateTimeout = time.Second * 1
 )
 
 // PanelSettings
@@ -96,7 +97,7 @@ func DefaultPanelSettings() *PanelSettings {
 		Port:                   DefaultPort,
 		LogLevel:               DefaultLogLevel,
 		Language:               DefaultLanguage,
-		DashboardUpdateTimeout: time.Second * 1,
+		DashboardUpdateTimeout: DefaultDashboardUpdateTimeout,
 	}
 }
 
