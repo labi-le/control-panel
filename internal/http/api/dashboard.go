@@ -42,8 +42,7 @@ func (m *Methods) GetDashboardInfo(c echo.Context) error {
 				break
 			}
 
-			// https://github.com/labi-le/control-panel/projects/1#card-82235433
-			time.Sleep(time.Millisecond * 500)
+			time.Sleep(m.Settings.DashboardUpdateTimeout)
 		}
 	}).ServeHTTP(c.Response(), c.Request())
 
