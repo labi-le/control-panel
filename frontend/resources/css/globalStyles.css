@@ -15,6 +15,7 @@
     --themeFourthLayerColor: #242424;
     --themeFourthLayerColorShadow: #2C2C2C;
     --themeTextColor: #FFFFFF;
+    --themeTextColorShadow: #a0a0a0;
 }
 
 html {
@@ -71,6 +72,10 @@ body {
     font-weight: bold;
 }
 
+::placeholder {
+    color: var(--themeTextColorShadow);
+}
+
 .formInput {
     background: var(--themeSecondLayerBlocksFieldColor);
     color: var(--themeTextColor);
@@ -122,17 +127,17 @@ body {
 
 .droppedList#droppedList-block {
     position: absolute;
-    padding: 4px;
-    margin-left: 224px;
     z-index: 2;
-    background: var(--themeFourthLayerColor);
-    border: none;
-    border-radius: 8px;
-    min-width: 214px;
+    min-width: 220px;
+    margin-top: 36px;
 }
 
 .droppedList.content {
-    margin: 2px;
+    padding: 4px;
+    border: none;
+    border-radius: 8px;
+    background: var(--themeFourthLayerColor);
+    margin-top: 4px;
     text-align: center;
 }
 
@@ -160,6 +165,7 @@ body {
     flex-direction: column;
     background: var(--themeFourthLayerColor);
     padding: 24px;
+    border-radius: 6px;
     min-width: 20%;
     max-width: 30%;
 }

@@ -28,7 +28,7 @@ const (
 // port - the port on which the panel will work
 // logLevel - the debug level of the panel
 // language - panel language
-// Theme - panel theme
+// DashboardUpdateTimeout - the timeout of updates dashboard
 type PanelSettings struct {
 	Addr                   string        `json:"addr"`
 	Port                   string        `json:"port"`

@@ -2,61 +2,55 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Панель управления</title>
+    <title>__panelName__</title>
     <link href="resources/css/globalStyles.css" rel="stylesheet">
     <link href="resources/css/page_dashboard.css" rel="stylesheet">
     <link href="resources/css/page_panelSettings.css" rel="stylesheet">
 </head>
-<body onload="initLocalStorage(); setContent('dashboard'); updateStatistics();">
-    <div class="leftPanel" id="leftPanel-block">
-        <div class="text leftPanel header" id="header-logo">Панель управления</div>
-        <div class="leftPanel content list">
-            <div class="button text listElement" onclick="setContent('dashboard'); updateStatistics();">Состояние сервера</div>
-            <div class="button text listElement" onclick="setContent('manageDomains')">Управление доменами</div>
-            <div class="button text listElement" onclick="setContent('manageMail')">Управление почтой</div>
-            <div class="button text listElement" onclick="setContent('manageDatabases')">Управление базами данных</div>
-            <div class="button text listElement" onclick="setContent('panelSettings')">Настройки панели</div>
-        </div>
-        <div class="button text leftPanel footerText" id="footer-changeTheme" onclick="changeTheme(null); localStorage.setItem('changeTheme', 'manual');">Сменить тему</div>
+<body onload="initPanel();">
+<div class="leftPanel" id="leftPanel-block">
+    <div class="text leftPanel header">__panelName__</div>
+    <div class="leftPanel content list">
+        <div class="button text listElement" onclick="setContent('dashboard'); initDashboard();">__dashboard__</div>
+        <div class="button text listElement" onclick="setContent('manageDomains')">__manageDomains__</div>
+        <div class="button text listElement" onclick="setContent('manageMails')">__manageMails__</div>
+        <div class="button text listElement" onclick="setContent('manageDatabases')">__manageDatabases__</div>
+        <div class="button text listElement" onclick="setContent('panelSettings')">__panelSettings__</div>
     </div>
-    <div class="mainView" id="mainView-block">
-        <div class="text mainView header" id="header-nowPage">Состояние сервера</div>
-        <div class="mainView content"></div>
-        <div class="text mainView footerText" id="footer-version"></div>
+    <div class="button text leftPanel footerText" id="footer-changeTheme"
+         onclick="changeTheme(null); localStorage.setItem('changeTheme', 'manual');">__leftPanel-footer__
     </div>
-    <div class="background"></div>
+</div>
+<div class="mainView" id="mainView-block">
+    <div class="text mainView header" id="header-nowPage"></div>
+    <div class="mainView content"></div>
+    <div class="text mainView footerText" id="footer-version"></div>
+</div>
+<div class="background"></div>
 </body>
 <script src="index.js"></script>
 <script src="resources/globalFunctions.js"></script>
 
 <template id="template-dashboard">
     <div class="dashboard" id="dashboard-block">
-        <div class="text dashboard header">Общая информация</div>
+        <div class="text dashboard header">__dashboard-header__</div>
         <div class="dashboard blocksContainer">
             <div class="dashboard innerBlock">
-                <div class="text dashboard innerBlockLabel">Всего памяти</div>
-                <div class="text dashboard innerBlockContent" id="totalMemVal"></div>
+                <div class="text dashboard innerBlockLabel">__dashboard-innerBlock-memory__</div>
+                <div class="dashboard list">
+                    <div class="text dashboard listElement" id="totalMemoryValue"></div>
+                    <div class="text dashboard listElement" id="usedMemoryValue"></div>
+                    <div class="text dashboard listElement" id="freeMemoryValue"></div>
+                    <div class="text dashboard listElement" id="cachedMemoryValue"></div>
+                </div>
             </div>
             <div class="dashboard innerBlock">
-                <div class="text dashboard innerBlockLabel">Использование памяти</div>
-                <div class="text dashboard innerBlockContent" id="usedMemVal"></div>
-            </div>
-            <div class="dashboard innerBlock">
-                <div class="text dashboard innerBlockLabel">Доступно памяти</div>
-                <div class="text dashboard innerBlockContent" id="freeMemVal"></div>
-            </div>
-            <div class="dashboard innerBlock">
-                <div class="text dashboard innerBlockLabel">Кэш памяти</div>
-                <div class="text dashboard innerBlockContent" id="cachedMemVal"></div>
-            </div>
-
-            <div class="dashboard innerBlock">
-                <div class="text dashboard innerBlockLabel">Нагрузка процессора</div>
+                <div class="text dashboard innerBlockLabel">__dashboard-innerBlock-CPU__</div>
                 <div class="text dashboard innerBlockContent" id="cpuLoadValue"></div>
             </div>
             <div class="dashboard innerBlock">
-                <div class="text dashboard innerBlockLabel">Сводка диска</div>
-                <div class="text dashboard list">
+                <div class="text dashboard innerBlockLabel">__dashboard-innerBlock-disk__</div>
+                <div class="dashboard list">
                     <div class="text dashboard listElement" id="partitionType"></div>
                     <div class="text dashboard listElement" id="totalDiskSizeValue"></div>
                     <div class="text dashboard listElement" id="freeDiskSizeValue"></div>
@@ -69,37 +63,68 @@
 </template>
 <template id="template-panelSettings">
     <div class="panelSettings" id="panelSettings-block">
-        <div class="text panelSettings header">Настройки</div>
+        <div class="text panelSettings header">__panelSettings-header__</div>
         <div class="panelSettings content">
             <div class="panelSettings innerBlock">
-                <input class="formInput innerBlockContent" id="newPortValue" type="number" min="1" placeholder="Новый порт" required>
+                <input class="formInput innerBlockContent" id="newPortValue" type="number" min="1"
+                       placeholder="__panelSettings-input-newPort__" required>
             </div>
             <div class="panelSettings innerBlock" id="formWithDroppedDynamicList">
-                <input class="formInput innerBlockContent" id="newLanguageValue" onfocusout="removeList(this.parentElement.id, 'droppedList-block')" onclick="createList(this.id, this.parentElement.id, [['ru', 'Русский'], ['en', 'English']])" placeholder="Новый язык" required>
+                <input class="formInput innerBlockContent" id="newLanguageValue"
+                       onclick="createList(this.id, this.parentElement.id, [['ru', 'Русский'], ['en', 'English']])"
+                       placeholder="__panelSettings-input-newLanguage__" required>
             </div>
         </div>
         <div class="panelSettings footer">
             <div class="text footer" id="statusUpdateSettings"></div>
-            <div class="button text footer" id="buttonUpdateSettings">Сохранить</div>
+            <div class="button text footer" id="buttonUpdateSettings">__panelSettings-footer-updateSettings__</div>
         </div>
     </div>
 </template>
 <template id="specialTemplate-window">
     <div class="window" id="window-block">
-        <div class="text window header">
+        <div class="window header">
             <div class="text window headerText" id="titleWindow"></div>
-            <div class="button text window headerButton" id="closeWindow" onclick="hideNotify()">Закрыть</div>
+            <div class="button text window headerButton" id="closeWindow" onclick="hideWindow()">
+                __window-header-closeWindow__
+            </div>
         </div>
-        <div class="text window content">
-            <!-- some content, generated by JS -->
-        </div>
+        <div class="text window content"></div>
     </div>
 </template>
 <template id="specialTemplate-droppedList">
     <div class="droppedList" id="droppedList-block">
-        <div class="droppedList content list">
-            <!-- some content, generated by JS -->
-        </div>
+        <div class="droppedList content list"></div>
+    </div>
+</template>
+<template id="specialTemplate-languageTemplates">
+    <div id="ru-language">
+        <div id="ru-panelName">Панель управления</div>
+
+        <div id="ru-dashboard">Состояние сервера</div>
+        <div id="ru-manageDomains">Управление доменами</div>
+        <div id="ru-manageMails">Управление почтой</div>
+        <div id="ru-manageDatabases">Управление базами данных</div>
+        <div id="ru-panelSettings">Настройки панели</div>
+
+        <div id="ru-leftPanel-footer">Сменить тему</div>
+
+        <div id="ru-dashboard-header">Общая статистика</div>
+        <div id="ru-dashboard-innerBlock-memory">Память</div>
+        <div id="ru-dashboard-innerBlock-CPU">Процессор</div>
+        <div id="ru-dashboard-innerBlock-disk">Диск</div>
+
+        <div id="ru-panelSettings-header">Настройки</div>
+        <div id="ru-panelSettings-input-newPort">Изменить порт</div>
+        <div id="ru-panelSettings-input-newLanguage">Изменить язык</div>
+        <div id="ru-panelSettings-footer-updateSettings">Сохранить</div>
+
+        <div id="ru-window-title-defaultNotification">Уведомление</div>
+        <div id="ru-window-title-showTask">Просмотр задачи</div>
+        <div id="ru-window-header-closeWindow">Закрыть</div>
+        <div id="ru-window-content-undefinedPage">Неизвестная страница</div>
+
+        <div id="ru-bug">Ошибка перевода</div>
     </div>
 </template>
 <!--
