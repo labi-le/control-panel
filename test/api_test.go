@@ -1,9 +1,10 @@
-package api
+package test
 
 import (
 	"bytes"
 	"encoding/json"
 	"github.com/labi-le/control-panel/internal"
+	"github.com/labi-le/control-panel/internal/http/api"
 	"github.com/labi-le/control-panel/internal/structures"
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
@@ -15,7 +16,7 @@ import (
 	"time"
 )
 
-var m *Methods
+var m *api.Methods
 
 func init() {
 	settings, err := internal.NewPanelSettings("./")
@@ -23,7 +24,7 @@ func init() {
 		panic(err)
 	}
 
-	m = NewMethods(settings, logrus.New())
+	m = api.NewMethods(settings, logrus.New())
 }
 
 func TestMethods_GetVersion(t *testing.T) {
