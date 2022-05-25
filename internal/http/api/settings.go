@@ -31,5 +31,14 @@ func (m *Methods) UpdateSettings(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err)
 	}
 
-	return nil
+	return c.JSON(http.StatusOK, s)
+}
+
+func (m *Methods) ResetSettings(c echo.Context) error {
+	err := m.Settings.ResetSettings()
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err)
+	}
+
+	return c.JSON(http.StatusOK, internal.DefaultPanelSettings())
 }

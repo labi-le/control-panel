@@ -23,6 +23,7 @@ func GetRoutes(m *api.Methods) *echo.Echo {
 
 	e.Router().Add(http.MethodGet, "/api/settings", m.GetSettings)
 	e.Router().Add(http.MethodPut, "/api/settings", m.UpdateSettings)
+	e.Router().Add(http.MethodGet, "/api/settings/reset", m.ResetSettings)
 	e.Router().Add(http.MethodGet, "/api/disk_partitions", m.GetDiskPartitions)
 	e.Router().Add(http.MethodGet, "/api/version", m.GetVersion)
 
