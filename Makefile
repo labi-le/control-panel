@@ -34,3 +34,6 @@ uninstall:
 clean:
 	@echo "Cleaning..."
 	rm -rf $(BUILD_PATH)*
+
+tests:
+	go test ./test/ -a
