@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 	"os"
 	"time"
 )
@@ -64,18 +65,20 @@ func NewPanelSettings(settingsPath string) (*PanelSettings, error) {
 	}
 
 	if _, err := os.Stat(settingsPath + DefaultSettingsFile); os.IsNotExist(err) {
-		fmt.Printf("Settings does not exist, creating in %s...\n", settingsPath)
 		err := os.MkdirAll(settingsPath, os.ModePerm)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	conn, err := gorm.Open(sqlite.Open(settingsPath+DefaultSettingsFile), &gorm.Config{})
+	conn, err := gorm.Open(
+		sqlite.Open(settingsPath+DefaultSettingsFile),
+		&gorm.Config{Logger: logger.Default.LogMode(logger.Silent)},
+	)
 	if err != nil {
 		return nil, err
 	}
-	if err = conn.AutoMigrate(DefaultPanelSettings()); err != nil {
+	if err = conn.AutoMigrate(&PanelSettings{}); err != nil {
 		return nil, err
 	}
 
@@ -104,8 +107,15 @@ func DefaultPanelSettings() *PanelSettings {
 // GetSettings returns the settings
 // if the settings are not found, it will save and return default settings
 func (p *PanelSettings) GetSettings() (*PanelSettings, error) {
-	if err := p.dbConn.FirstOrCreate(p, DefaultPanelSettings()).Error; err != nil {
-		return nil, err
+	if err := p.dbConn.Where("_rowid_ = ?", 1).First(p).Error; err != nil {
+		if err = p.dbConn.Create(DefaultPanelSettings()).Error; err != nil {
+			return nil, err
+		} else {
+			pp := DefaultPanelSettings()
+			pp.dbConn = p.dbConn
+
+			return pp, nil
+		}
 	}
 
 	return p, nil
@@ -114,6 +124,10 @@ func (p *PanelSettings) GetSettings() (*PanelSettings, error) {
 // UpdateSettings updates the settings
 func (p *PanelSettings) UpdateSettings(settings PanelSettings) error {
 	return p.dbConn.Model(&settings).Where("_rowid_ = ?", 1).Updates(&settings).Error
+}
+
+func (p *PanelSettings) ResetSettings() error {
+	return p.UpdateSettings(*DefaultPanelSettings())
 }
 
 // String returns config as string
