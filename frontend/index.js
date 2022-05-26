@@ -37,18 +37,18 @@ function initDashboard() {
         if (localStorage.getItem("nowPage") !== "dashboard") return;
         let dataDashboard = JSON.parse(event.data)[0];
         // memory info
-        document.getElementById("totalMemoryValue").innerHTML = `Всего: ${formatBytes(dataDashboard.mem.total)}`;
-        document.getElementById("usedMemoryValue").innerHTML = `Используется: ${formatBytes(dataDashboard.mem.used)}`;
-        document.getElementById("freeMemoryValue").innerHTML = `Свободно: ${formatBytes(dataDashboard.mem.free)}`;
-        document.getElementById("cachedMemoryValue").innerHTML = `Кэш: ${formatBytes(dataDashboard.mem.cached)}`;
+        document.getElementById("totalMemoryValue").innerHTML = formatBytes(dataDashboard.mem.total);
+        document.getElementById("usedMemoryValue").innerHTML = formatBytes(dataDashboard.mem.used);
+        document.getElementById("freeMemoryValue").innerHTML = formatBytes(dataDashboard.mem.free);
+        document.getElementById("cachedMemoryValue").innerHTML = formatBytes(dataDashboard.mem.cached);
         // CPU info
-        document.getElementById("cpuLoadValue").innerHTML = `Нагрузка: ${parseFloat(dataDashboard.cpu_load.load).toFixed(2)}%`;
+        document.getElementById("loadCPUValue").innerHTML = `${parseFloat(dataDashboard.cpu_load.load).toFixed(2)}%`;
         // disk info
-        document.getElementById("partitionType").innerHTML = `- Тип раздела (${dataDashboard.io.path}): ${dataDashboard.io.fstype}`;
-        document.getElementById("totalDiskSizeValue").innerHTML = `-- Всего: ${formatBytes(dataDashboard.io.total)}`;
-        document.getElementById("freeDiskSizeValue").innerHTML = `-- Свободно: ${formatBytes(dataDashboard.io.free)}`;
-        document.getElementById("usedDiskSizeValue").innerHTML = `-- Используется: ${formatBytes(dataDashboard.io.used)}`;
-        document.getElementById("usedDiskSizeInPercentValue").innerHTML = `-- Используется: ${parseFloat(dataDashboard.io.usedPercent).toFixed(2)}%`;
+        document.getElementById("partitionTypeValue").innerHTML = `${dataDashboard.io.fstype} ${dataDashboard.io.path}`;
+        document.getElementById("totalDiskSizeValue").innerHTML = formatBytes(dataDashboard.io.total);
+        document.getElementById("usedDiskSizeValue").innerHTML = formatBytes(dataDashboard.io.used);
+        document.getElementById("usedDiskSizeInPercentValue").innerHTML = `${parseFloat(dataDashboard.io.usedPercent).toFixed(2)}%`;
+        document.getElementById("freeDiskSizeValue").innerHTML = formatBytes(dataDashboard.io.free);
     });
 
     webSocket.addEventListener("close", function () {
