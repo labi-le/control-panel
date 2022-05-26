@@ -114,7 +114,7 @@ body {
 }
 
 .mainView.header {
-    white-space: pre-wrap;
+    /* some styles */
 }
 
 .mainView.content {
