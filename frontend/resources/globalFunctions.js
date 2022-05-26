@@ -48,7 +48,6 @@ function setContent(page) {
         showWindow(null, getTextByTemplatePhrase(localStorage.getItem("nowLanguage"), "window-content-undefinedPage"));
     } else {
         localStorage.setItem("nowPage", page);
-        document.querySelector(".mainView.header").innerHTML = getTextByTemplatePhrase(localStorage.getItem("nowLanguage"), page);
         document.querySelector(".mainView.content").innerHTML = "";
         document.querySelector(".mainView.content").append(document.querySelector(`#template-${page}`).content.cloneNode(true));
     }
@@ -127,38 +126,52 @@ function removeList() {
 function changeLanguage(lang) {
     let languages = document.querySelector("#specialTemplate-languageTemplates").content.cloneNode(true);
     let elements = document.querySelectorAll("title, template, div.text, input.formInput");
+    if (languages.querySelector(`#${lang}-language`) === null) return;
     elements.forEach((element) => {
         if (element.content !== undefined) {
             element.content.querySelectorAll("div.text, input.formInput").forEach((templateElement) => {
-                if (templateElement.placeholder !== undefined) setPlaceholderInElement(templateElement);
-                if (templateElement.innerHTML !== "") setTextInElement(templateElement);
+                if (templateElement.dataset.templatePhrase !== undefined) setTextInElement(templateElement, templateElement.dataset.typeTemplatePhrase);
             });
         } else {
-            if (element.placeholder !== undefined) setPlaceholderInElement(element);
-            if (element.innerHTML !== "") setTextInElement(element);
+            if (element.dataset.templatePhrase !== undefined) setTextInElement(element, element.dataset.typeTemplatePhrase);
         }
     });
 
-    function setTextInElement(element) {
-        let elementPhraseTemplate = element.innerHTML.match(/__(.*)__/)[1];
-        if (languages.querySelector(`#${lang}-language`).querySelector(`#${lang}-${elementPhraseTemplate}`) !== null) {
-            element.innerHTML = languages.querySelector(`#${lang}-language`).querySelector(`#${lang}-${elementPhraseTemplate}`).innerHTML;
-        } else element.innerHTML = languages.querySelector(`#${lang}-language`).querySelector(`#${lang}-bug`).innerHTML;
-    }
+    localStorage.setItem("nowLanguage", lang);
 
-    function setPlaceholderInElement(element) {
-        let elementPhraseTemplate = element.placeholder.match(/__(.*)__/)[1];
-        if (languages.querySelector(`#${lang}-language`).querySelector(`#${lang}-${elementPhraseTemplate}`) !== null) {
-            element.placeholder = languages.querySelector(`#${lang}-language`).querySelector(`#${lang}-${elementPhraseTemplate}`).innerHTML;
-        } else element.placeholder = languages.querySelector(`#${lang}-language`).querySelector(`#${lang}-bug`).innerHTML;
+    function setTextInElement(element, type) {
+        let elementPhraseTemplate = element.dataset.templatePhrase.match(/__(.*)__/)[1];
+
+        switch (type) {
+            case "0":
+                element.innerHTML = languages.querySelector(`#${lang}-language`).querySelector(`#${lang}-${languages.querySelector(`#${lang}-language`).querySelector(`#${lang}-${elementPhraseTemplate}`) !== null ? elementPhraseTemplate : "bug"}`).innerHTML;
+                break;
+            case "1":
+                element.placeholder = languages.querySelector(`#${lang}-language`).querySelector(`#${lang}-${languages.querySelector(`#${lang}-language`).querySelector(`#${lang}-${elementPhraseTemplate}`) !== null ? elementPhraseTemplate : "bug"}`).innerHTML;
+        }
+
     }
 }
 
 function getTextByTemplatePhrase(lang, phrase) {
     let languages = document.querySelector("#specialTemplate-languageTemplates").content.cloneNode(true);
-    if (languages.querySelector(`#${lang}-language`).querySelector(`#${lang}-${phrase}`) !== null) {
-        return languages.querySelector(`#${lang}-language`).querySelector(`#${lang}-${phrase}`).innerHTML;
-    } else return languages.querySelector(`#${lang}-language`).querySelector(`#${lang}-bug`).innerHTML;
+
+    return languages.querySelector(`#${lang}-language`).querySelector(`#${lang}-${languages.querySelector(`#${lang}-language`).querySelector(`#${lang}-${phrase}`) !== null ? phrase : "bug"}`).innerHTML;
+}
+
+function updateSettings(listOfElementsId) {
+    listOfElementsId.forEach((elementId) => {
+        if (document.getElementById(elementId).dataset.value === undefined) return;
+        switch (document.getElementById(elementId).dataset.parameter) {
+            case "port":
+                // ...
+                break;
+            case "language":
+                changeLanguage(document.getElementById(elementId).dataset.value);
+                break;
+        }
+        // TODO: update settings in server-side
+    });
 }
 
 function special_eventHandler(event) {
