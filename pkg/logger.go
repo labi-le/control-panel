@@ -2,6 +2,9 @@ package pkg
 
 import "github.com/sirupsen/logrus"
 
+// Logger
+// Compatability with overseer.Logger
+// Trick to avoid breaking the interface
 type Logger struct {
 	*logrus.Logger
 }
