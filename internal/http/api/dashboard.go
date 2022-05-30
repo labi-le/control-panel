@@ -3,6 +3,7 @@ package api
 import (
 	"github.com/labi-le/control-panel/internal"
 	"github.com/labi-le/control-panel/internal/structures"
+	"github.com/labi-le/control-panel/internal/utils"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/net/websocket"
 	"time"
@@ -12,13 +13,13 @@ func (m *Methods) GetDashboardInfo(c echo.Context) error {
 	websocket.Handler(func(ws *websocket.Conn) {
 		defer ws.Close()
 
-		m.Logger().Infof("Client connected %s", ws.Request().RemoteAddr)
+		utils.Log().Infof("Client connected %s", ws.Request().RemoteAddr)
 
 		var dashboard structures.DashboardParams
 		err := websocket.JSON.Receive(ws, &dashboard)
 		if err != nil {
 			if _, err := ws.Write([]byte("Invalid request")); err != nil {
-				m.Logger().Error(err)
+				utils.Log().Error(err.Error())
 			}
 		}
 

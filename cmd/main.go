@@ -7,8 +7,8 @@ import (
 	"github.com/labi-le/control-panel/internal"
 	router "github.com/labi-le/control-panel/internal/http"
 	"github.com/labi-le/control-panel/internal/http/api"
+	"github.com/labi-le/control-panel/internal/utils"
 	"github.com/labi-le/control-panel/pkg"
-	"github.com/sirupsen/logrus"
 	"log"
 	"net/http"
 	"os"
@@ -39,20 +39,15 @@ func main() {
 		log.Fatal(err)
 	}
 
-	level, err := logrus.ParseLevel(conf.GetLogLevel())
-	if err != nil {
-		panic("invalid log level")
-	}
+	utils.ConfigureLogger(conf.GetLogLevel())
+	// Configure global logger
 
-	logger := logrus.New()
-	logger.SetLevel(level)
-
-	resolver := api.NewMethods(conf, logger)
-	srv := pkg.NewServer(router.GetRoutes(resolver), conf, logger)
+	resolver := api.NewMethods(conf)
+	srv := pkg.NewServer(router.GetRoutes(resolver), conf)
 
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			srv.Logger().Fatal(err)
+			utils.Log().Fatal(err)
 		}
 	}()
 
@@ -62,12 +57,12 @@ func main() {
 
 	// Waiting for SIGINT (kill -2)
 	<-stop
-	srv.Logger().Info("Gracefully shutdown server...")
+	utils.Log().Info("Gracefully shutdown server...")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 	if err := srv.Shutdown(ctx); err != nil {
-		srv.Logger().Fatal(err)
+		utils.Log().Fatal(err)
 	}
 
 }

@@ -2,25 +2,20 @@ package pkg
 
 import (
 	"fmt"
+	"github.com/labi-le/control-panel/internal/utils"
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
 	"net/http"
 )
 
 type Server struct {
-	router *echo.Echo
-	logger *logrus.Logger
-
+	router        *echo.Echo
 	PanelSettings ConfigInterface
 	*http.Server
 }
 
-func (s *Server) Logger() *logrus.Logger {
-	return s.logger
-}
-
-func NewServer(router *echo.Echo, config ConfigInterface, logger *logrus.Logger) *Server {
-	srv := &Server{router: router, logger: logger, PanelSettings: config}
+func NewServer(router *echo.Echo, config ConfigInterface) *Server {
+	srv := &Server{router: router, PanelSettings: config}
 
 	return srv
 }
@@ -30,8 +25,8 @@ func (s *Server) ListenAndServe() error {
 
 	// todo add https support
 	//goland:noinspection HttpUrlsUsage
-	s.Logger().Infof("Panel is available at http://%s:%s", s.PanelSettings.GetAddr(), s.PanelSettings.GetPort())
-	s.Logger().Log(logrus.InfoLevel, "Rest api started")
+	utils.Log().Infof("Panel is available at http://%s:%s", s.PanelSettings.GetAddr(), s.PanelSettings.GetPort())
+	utils.Log().Log(logrus.InfoLevel, "Rest api started")
 
 	s.Server = &http.Server{
 		Handler: s,
@@ -43,7 +38,7 @@ func (s *Server) ListenAndServe() error {
 
 func (s *Server) logMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		s.Logger().Info(fmt.Sprintf("%s %s %d", c.Request().Method, c.Request().URL.Path, c.Response().Status))
+		utils.Log().Info(fmt.Sprintf("%s %s %d", c.Request().Method, c.Request().URL.Path, c.Response().Status))
 		return next(c)
 	}
 }
