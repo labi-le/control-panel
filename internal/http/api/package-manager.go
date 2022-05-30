@@ -1,41 +1,60 @@
 package api
 
 import (
-	"errors"
 	"github.com/ShinyTrinkets/overseer"
-	utils2 "github.com/labi-le/control-panel/pkg/utils"
+	"github.com/labi-le/control-panel/pkg/utils"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/net/websocket"
-	"syscall"
 )
 
-func (m *Methods) UpdatePackage(c echo.Context) error {
+type Command struct {
+	Name string   `json:"name"`
+	Exec string   `json:"exec"`
+	Args []string `json:"args"`
+}
+
+func PMCommand(c echo.Context, m *Methods, cmd Command) error {
 	websocket.Handler(func(ws *websocket.Conn) {
 		defer ws.Close()
 
-		utils2.Log().Infof("Client connected %s", ws.Request().RemoteAddr)
-
-		opt := overseer.Options{
+		overOpt := overseer.Options{
 			Buffered:  false,
 			Streaming: true,
 		}
 
 		over := overseer.NewOverseer()
-		cmd := over.Add("pacman update", "pacman", []string{
-			"-Syu",
-			"--noconfirm",
-		}, opt)
+		utils.Log().Infof("Client connected %s", ws.Request().RemoteAddr)
 
-		err := utils2.ManageProc(cmd, over, ws)
-		if err != nil {
-			utils2.Log().Info(cmd.Stop().Error())
-			if errors.Is(err, syscall.EPIPE) {
-				utils2.Log().Infof("Client disconnected %s", ws.Request().RemoteAddr)
-				return
-			}
+		cmd := over.Add(cmd.Name, cmd.Exec, cmd.Args, overOpt)
+
+		if err := utils.ManageProc(cmd, over, ws); err != nil {
+			m.badResponseWS(ws, err)
+			return
 		}
 
 	}).ServeHTTP(c.Response(), c.Request())
 
 	return nil
+}
+
+func (m *Methods) UpdatePackage(c echo.Context) error {
+	return PMCommand(c, m, Command{
+		Name: "update",
+		Exec: "apt",
+		Args: []string{
+			"update",
+			"-y",
+		},
+	})
+}
+
+func (m *Methods) DeletePackage(c echo.Context) error {
+	return PMCommand(c, m, Command{
+		Name: "remove",
+		Exec: "apt",
+		Args: []string{
+			"remove",
+			"-y",
+		},
+	})
 }
