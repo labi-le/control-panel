@@ -3,7 +3,7 @@ package api
 import (
 	"github.com/labi-le/control-panel/internal"
 	"github.com/labi-le/control-panel/internal/structures"
-	"github.com/labi-le/control-panel/internal/utils"
+	"github.com/labi-le/control-panel/pkg/utils"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/net/websocket"
 	"time"

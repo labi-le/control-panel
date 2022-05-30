@@ -7,7 +7,6 @@ import (
 	"github.com/labi-le/control-panel/internal/http/api"
 	"github.com/labi-le/control-panel/internal/structures"
 	"github.com/labstack/echo/v4"
-	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -24,7 +23,7 @@ func init() {
 		panic(err)
 	}
 
-	m = api.NewMethods(settings, logrus.New())
+	m = api.NewMethods(settings)
 }
 
 func TestMethods_GetVersion(t *testing.T) {

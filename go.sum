@@ -2,13 +2,16 @@ github.com/ShinyTrinkets/meta-logger v0.2.0 h1:oR533+wuhSJ+vLsnSq1CBSGQygNv8nDsv
 github.com/ShinyTrinkets/meta-logger v0.2.0/go.mod h1:cY1KnpPfpLIopR+arZXHYVrVGO6AETrhi3HmRGFjU+U=
 github.com/ShinyTrinkets/overseer v0.4.0 h1:NOr5I8GBCaE/qgBO0+nwy2X71VZRi5fXM3eiin6aivo=
 github.com/ShinyTrinkets/overseer v0.4.0/go.mod h1:cq8CvbZ3ioFmGrHokSAJalS0lC+pVXLKhITScItUGXY=
+github.com/azer/is-terminal v1.0.0 h1:COvj8jmg2xMz0CqHn4Uu8X1m7Dmzmu0CpciBaLtJQBg=
 github.com/azer/is-terminal v1.0.0/go.mod h1:5geuIpRQvdv6g/Q1MwXHbmNUlFLg8QcheGk4dZOmxQU=
+github.com/azer/logger v1.0.0 h1:3T4BnTLyndJWHajOyECt2kAhnvP30KCrVAkYcMjHrXk=
 github.com/azer/logger v1.0.0/go.mod h1:iaDID7UeBTyUh31bjGFlLkr87k23z/mHMMLzt6YQQHU=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/go-ole/go-ole v1.2.6 h1:/Fpf6oFPoeFik9ty7siob0G6Ke8QvQEuVcuChpwXzpY=
 github.com/go-ole/go-ole v1.2.6/go.mod h1:pprOEPIfldk/42T2oK7lQ4v4JSDwmV0As9GaiUsvbm0=
+github.com/go-test/deep v1.0.1 h1:UQhStjbkDClarlmv0am7OXXO4/GaPdCGiUiMTvi28sg=
 github.com/go-test/deep v1.0.1/go.mod h1:wGDj63lr65AM2AQyKZd/NYHGb0R+1RLqB8NKt3aSFNA=
 github.com/google/go-cmp v0.5.6/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
 github.com/google/go-cmp v0.5.7/go.mod h1:n+brtR0CgQNWTVd5ZUFpTBC8YFBDLK/h/bpaJ8/DtOE=

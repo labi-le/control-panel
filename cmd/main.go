@@ -7,9 +7,8 @@ import (
 	"github.com/labi-le/control-panel/internal"
 	router "github.com/labi-le/control-panel/internal/http"
 	"github.com/labi-le/control-panel/internal/http/api"
-	"github.com/labi-le/control-panel/internal/utils"
 	"github.com/labi-le/control-panel/pkg"
-	"log"
+	"github.com/labi-le/control-panel/pkg/utils"
 	"net/http"
 	"os"
 	"os/signal"
@@ -36,7 +35,7 @@ func main() {
 
 	conf, err := internal.NewPanelSettings(config)
 	if err != nil {
-		log.Fatal(err)
+		utils.Log().Fatal(err)
 	}
 
 	utils.ConfigureLogger(conf.GetLogLevel())

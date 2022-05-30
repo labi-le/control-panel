@@ -3,6 +3,7 @@ module github.com/labi-le/control-panel
 go 1.18
 
 require (
+	github.com/ShinyTrinkets/overseer v0.4.0
 	github.com/labstack/echo/v4 v4.7.2
 	github.com/mackerelio/go-osstat v0.2.2
 	github.com/shirou/gopsutil/v3 v3.22.4
@@ -15,7 +16,6 @@ require (
 
 require (
 	github.com/ShinyTrinkets/meta-logger v0.2.0 // indirect
-	github.com/ShinyTrinkets/overseer v0.4.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect

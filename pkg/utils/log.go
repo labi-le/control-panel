@@ -1,11 +1,10 @@
 package utils
 
 import (
-	"github.com/labi-le/control-panel/pkg"
 	"github.com/sirupsen/logrus"
 )
 
-var logger *pkg.Logger
+var logger *Logger
 
 func ConfigureLogger(lvl string) {
 	levelValid, err := logrus.ParseLevel(lvl)
@@ -14,9 +13,9 @@ func ConfigureLogger(lvl string) {
 	}
 	l := logrus.New()
 	l.SetLevel(levelValid)
-	logger = pkg.NewLogger(l)
+	logger = NewLogger(l)
 }
 
-func Log() *pkg.Logger {
+func Log() *Logger {
 	return logger
 }

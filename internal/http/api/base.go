@@ -4,7 +4,7 @@ import (
 	"errors"
 	"github.com/labi-le/control-panel/internal"
 	"github.com/labi-le/control-panel/internal/structures"
-	"github.com/labi-le/control-panel/internal/utils"
+	"github.com/labi-le/control-panel/pkg/utils"
 	"golang.org/x/net/websocket"
 	"syscall"
 )
