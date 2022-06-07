@@ -2,6 +2,7 @@ package internal
 
 import (
 	"fmt"
+	"github.com/sirupsen/logrus"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -18,7 +19,7 @@ const (
 	PanelVersion = "0.0.1"
 
 	DefaultLanguage               = "en"
-	DefaultLogLevel               = "debug"
+	DefaultLogLevel               = logrus.DebugLevel
 	DefaultAddr                   = "0.0.0.0"
 	DefaultPort                   = "7777"
 	DefaultDashboardUpdateTimeout = time.Second * 1
@@ -32,7 +33,7 @@ const (
 type PanelSettings struct {
 	Addr                   string        `json:"addr"`
 	Port                   string        `json:"port"`
-	LogLevel               string        `json:"log_level"`
+	LogLevel               logrus.Level  `json:"log_level"`
 	Language               string        `json:"language"`
 	DashboardUpdateTimeout time.Duration `json:"dashboard_update_timeout"`
 
@@ -48,7 +49,7 @@ func (p *PanelSettings) GetPort() string {
 }
 
 func (p *PanelSettings) GetLogLevel() string {
-	return p.LogLevel
+	return p.LogLevel.String()
 }
 
 func (p *PanelSettings) GetLanguage() string {
