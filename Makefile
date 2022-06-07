@@ -15,7 +15,8 @@ run:
 
 build-release: clean
 	@echo "Building..."
-	go build -ldflags "-s" -a -v -o $(BUILD_PATH)$(PROJ_NAME) $(MAIN_PATH)
+	#go build -ldflags "-s" -a -v -o $(BUILD_PATH)$(PROJ_NAME) $(MAIN_PATH)
+	go build -ldflags "-linkmode external -extldflags "-static" -s" -a -v -o $(BUILD_PATH)$(PROJ_NAME) $(MAIN_PATH)
 
 build: clean
 	@echo "Building..."
