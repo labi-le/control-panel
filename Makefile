@@ -15,7 +15,7 @@ run:
 
 build-release: clean
 	@echo "Building..."
-	goreleaser release --rm-dist
+	goreleaser release --snapshot --rm-dist
 
 build: clean
 	@echo "Building..."
