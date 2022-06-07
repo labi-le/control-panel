@@ -7,6 +7,7 @@ import (
 	"github.com/labi-le/control-panel/internal/http/api"
 	"github.com/labi-le/control-panel/internal/structures"
 	"github.com/labstack/echo/v4"
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -108,7 +109,7 @@ func TestMethods_UpdateSettings(t *testing.T) {
 	body := &internal.PanelSettings{
 		Addr:                   "0.0.0.0",
 		Port:                   "9999",
-		LogLevel:               "info",
+		LogLevel:               logrus.InfoLevel,
 		Language:               "jp",
 		DashboardUpdateTimeout: 10 * time.Second,
 	}
@@ -134,7 +135,7 @@ func TestMethods_UpdateSettings(t *testing.T) {
 
 	assert.Equal(t, body.Addr, resp.GetAddr())
 	assert.Equal(t, body.Port, resp.GetPort())
-	assert.Equal(t, body.LogLevel, resp.GetLogLevel())
+	assert.Equal(t, body.LogLevel.String(), resp.GetLogLevel())
 	assert.Equal(t, body.Language, resp.GetLanguage())
 	assert.Equal(t, body.DashboardUpdateTimeout, resp.GetDashboardUpdateTimeout())
 }
