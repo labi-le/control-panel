@@ -15,12 +15,11 @@ run:
 
 build-release: clean
 	@echo "Building..."
-	#go build -ldflags "-s" -a -v -o $(BUILD_PATH)$(PROJ_NAME) $(MAIN_PATH)
-	go build -ldflags "-linkmode external -extldflags "-static" -s" -a -v -o $(BUILD_PATH)$(PROJ_NAME) $(MAIN_PATH)
+	goreleaser release --rm-dist
 
 build: clean
 	@echo "Building..."
-	go build -v -o $(BUILD_PATH)$(PROJ_NAME) $(MAIN_PATH)
+	goreleaser release --skip-publish --snapshot --rm-dist
 
 install: build-release uninstall
 	@echo "Installing..."

@@ -1,0 +1,53 @@
+before:
+  hooks:
+    - go mod tidy
+    - go generate ./...
+    - go test ./...
+
+builds:
+  - env:
+      - CGO_ENABLED=1
+    goos:
+      - linux
+    goarch:
+      - amd64
+    dir: cmd
+
+    ldflags:
+      - '-linkmode external'
+      - '-extldflags "-static"'
+      - -s
+    flags:
+      - -v
+archives:
+  - replacements:
+      linux: Linux
+      amd64: x86_64
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ incpatch .Version }}-next"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+
+nfpms:
+  - id: "control-panel"
+    file_name_template: "{{ .ConventionalFileName }}"
+    description: "Control Panel"
+    formats:
+      - deb
+    license: "GPLv3"
+    section: "default"
+    priority: "extra"
+    contents:
+      - src: dist/control-panel_linux_amd64/control-panel
+        dst: /opt/control-panel/panel
+      - src: ./frontend/
+        dst: /opt/control-panel/frontend
+      - src: /opt/control-panel/panel
+        dst: /sbin/control-panel
+        type: symlink
