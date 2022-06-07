@@ -1,8 +1,6 @@
 before:
   hooks:
     - go mod tidy
-    - go generate ./...
-    - go test ./...
 
 builds:
   - env:
@@ -51,3 +49,5 @@ nfpms:
       - src: /opt/control-panel/panel
         dst: /sbin/control-panel
         type: symlink
+    scripts:
+      postremove: scripts/postremove.sh

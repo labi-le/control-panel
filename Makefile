@@ -21,16 +21,6 @@ build: clean
 	@echo "Building..."
 	goreleaser release --skip-publish --snapshot --rm-dist
 
-install: build-release uninstall
-	@echo "Installing..."
-	mv $(BUILD_PATH)$(PROJ_NAME) $(INSTALL_PATH)$(PROJ_NAME)
-
-uninstall:
-	@echo "Uninstalling..."
-	rm $(INSTALL_PATH)$(PROJ_NAME)
-	@echo "Remove configuration file..."
-	rm -rf ~/.config/$(PROJ_NAME)/
-
 clean:
 	@echo "Cleaning..."
 	rm -rf $(BUILD_PATH)*
