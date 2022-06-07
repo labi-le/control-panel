@@ -39,6 +39,7 @@ nfpms:
     formats:
       - deb
     license: "GPLv3"
+    maintainer: "github.com/labi-le/control-panel/graphs/contributors"
     section: "default"
     priority: "extra"
     contents:
