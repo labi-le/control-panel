@@ -9,7 +9,7 @@ import (
 func (m *Methods) GetDiskPartitions(c echo.Context) error {
 	dp, err := internal.GetDiskPartitions()
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err)
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
 	return c.JSON(http.StatusOK, dp)
