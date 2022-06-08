@@ -38,8 +38,10 @@ func main() {
 		utils.Log().Fatal(err)
 	}
 
-	utils.ConfigureLogger(conf.GetLogLevel())
 	// Configure global logger
+	utils.ConfigureLogger(conf.GetLogLevel())
+
+	checkSudo()
 
 	resolver := api.NewMethods(conf)
 	srv := pkg.NewServer(router.GetRoutes(resolver), conf)
@@ -64,4 +66,10 @@ func main() {
 		utils.Log().Fatal(err)
 	}
 
+}
+
+func checkSudo() {
+	if os.Geteuid() != 0 {
+		utils.Log().Fatal("You must run this program as root")
+	}
 }
