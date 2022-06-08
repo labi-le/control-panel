@@ -52,3 +52,4 @@ nfpms:
         type: symlink
     scripts:
       postremove: scripts/postremove.sh
+      postinstall: scripts/postinstall.sh
