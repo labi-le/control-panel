@@ -11,7 +11,7 @@ INSTALL_PATH = /usr/local/bin/
 export CGO_ENABLED = 1
 
 run:
-	go run $(MAIN_PATH)
+	go run -v $(MAIN_PATH)
 
 build-release: clean
 	@echo "Building..."
