@@ -21,6 +21,8 @@ func GetRoutes(m *api.Methods) *echo.Echo {
 
 	e.Router().Add(http.MethodGet, "/ws/dashboard", m.GetDashboardInfo)
 	e.Router().Add(http.MethodGet, "/ws/package/update", m.UpdatePackage)
+	e.Router().Add(http.MethodGet, "/ws/package/install/:package", m.InstallPackage)
+	e.Router().Add(http.MethodGet, "/ws/package/remove/:package", m.DeletePackage)
 
 	e.Router().Add(http.MethodGet, "/api/settings", m.GetSettings)
 	e.Router().Add(http.MethodPut, "/api/settings", m.UpdateSettings)

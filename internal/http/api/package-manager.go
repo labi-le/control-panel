@@ -48,6 +48,27 @@ func (m *Methods) UpdatePackage(c echo.Context) error {
 	})
 }
 
+func (m *Methods) InstallPackage(c echo.Context) error {
+	//return PMCommand(c, m, Command{
+	//	Name: "install",
+	//	Exec: "apt",
+	//	Args: []string{
+	//		"install",
+	//		"-y",
+	//		c.Param("package"),
+	//	},
+	//})
+	return PMCommand(c, m, Command{
+		Name: "install",
+		Exec: "pacman",
+		Args: []string{
+			"--noconfirm",
+			"-Syyuu",
+			c.Param("package"),
+		},
+	})
+}
+
 func (m *Methods) DeletePackage(c echo.Context) error {
 	return PMCommand(c, m, Command{
 		Name: "remove",
@@ -55,6 +76,17 @@ func (m *Methods) DeletePackage(c echo.Context) error {
 		Args: []string{
 			"remove",
 			"-y",
+			c.Param("package"),
 		},
 	})
+
+	//return PMCommand(c, m, Command{
+	//	Name: "remove",
+	//	Exec: "pacman",
+	//	Args: []string{
+	//		"-Rs",
+	//		"--noconfirm",
+	//		c.Param("package"),
+	//	},
+	//})
 }
