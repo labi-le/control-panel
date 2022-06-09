@@ -8,9 +8,9 @@
     <link href="resources/css/page_panelSettings.css" rel="stylesheet">
 </head>
 <body onload="initPanel();">
-<div class="leftPanel" id="leftPanel-block">
-    <div class="text leftPanel header" data-template-phrase="__panelName__" data-type-template-phrase="0"></div>
-    <div class="leftPanel content list">
+<div class="block shadowy leftPanel">
+    <div class="header text" data-template-phrase="__panelName__" data-type-template-phrase="0"></div>
+    <div class="blockContent forceBackground content list">
         <div class="button text listElement" onclick="setContent('dashboard'); initDashboard();"
              data-template-phrase="__dashboard__" data-type-template-phrase="0"></div>
         <div class="button text listElement" onclick="setContent('manageDomains')"
@@ -22,100 +22,99 @@
         <div class="button text listElement" onclick="setContent('panelSettings')"
              data-template-phrase="__panelSettings__" data-type-template-phrase="0"></div>
     </div>
-    <div class="button text leftPanel footerText" id="footer-changeTheme"
+    <div class="button text footer" id="footer-changeTheme"
          onclick="changeTheme(null); localStorage.setItem('changeTheme', 'manual');"
          data-template-phrase="__leftPanel-footer__" data-type-template-phrase="0"></div>
 </div>
-<div class="mainView" id="mainView-block">
-    <div class="text mainView header" id="header-nowPage">&#8203;</div>
-    <div class="mainView content"></div>
-    <div class="text mainView footerText" id="footer-version"></div>
+<div class="block mainView">
+    <div class="shadowy header text">&#8203;</div>
+    <div class="content" id="mainApp"></div>
+    <div class="shadowy footer text" id="footer-version">&#8203;</div>
 </div>
 <div class="background"></div>
 </body>
-<script src="index.js"></script>
-<script src="resources/globalFunctions.js"></script>
+<script src="resources/js/index.js"></script>
+<script src="resources/js/globalFunctions.js"></script>
 
 <template id="template-dashboard">
-    <div class="dashboard" id="dashboard-block">
-        <div class="text dashboard header" data-template-phrase="__dashboard-header__"
-             data-type-template-phrase="0"></div>
-        <div class="dashboard blocksContainer">
-            <div class="dashboard innerBlock">
-                <div class="text dashboard innerBlockLabel" data-template-phrase="__dashboard-innerBlock-memory__"
+    <div class="block littleShadowy dashboard">
+        <div class="header text" data-template-phrase="__dashboard-header__" data-type-template-phrase="0"></div>
+        <div class="blockContent blocksContainer containerRow">
+            <div class="blockOfContainer lighter withBorders">
+                <div class="text label" data-template-phrase="__dashboard-innerBlock-memory__"
                      data-type-template-phrase="0"></div>
-                <div class="dashboard list">
-                    <div class="dashboard listElement">
-                        <div class="text dashboard listElement label"
+                <div class="forceBackground list">
+                    <div class="listElement withLabels">
+                        <div class="text label"
                              data-template-phrase="__dashboard-innerBlock-memory-label-totalMemory__"
                              data-type-template-phrase="0"></div>
-                        <div class="text dashboard listElement value" id="totalMemoryValue"></div>
+                        <div class="text value" id="totalMemoryValue"></div>
                     </div>
-                    <div class="dashboard listElement">
-                        <div class="text dashboard listElement label"
+                    <div class="listElement withLabels">
+                        <div class="text label"
                              data-template-phrase="__dashboard-innerBlock-memory-label-usedMemory__"
                              data-type-template-phrase="0"></div>
-                        <div class="text dashboard listElement value" id="usedMemoryValue"></div>
+                        <div class="text value" id="usedMemoryValue"></div>
                     </div>
-                    <div class="dashboard listElement">
-                        <div class="text dashboard listElement label"
+                    <div class="listElement withLabels">
+                        <div class="text label"
                              data-template-phrase="__dashboard-innerBlock-memory-label-freeMemory__"
                              data-type-template-phrase="0"></div>
-                        <div class="text dashboard listElement value" id="freeMemoryValue"></div>
+                        <div class="text value" id="freeMemoryValue"></div>
                     </div>
-                    <div class="dashboard listElement">
-                        <div class="text dashboard listElement label"
+                    <div class="listElement withLabels">
+                        <div class="text label"
                              data-template-phrase="__dashboard-innerBlock-memory-label-cachedMemory__"
                              data-type-template-phrase="0"></div>
-                        <div class="text dashboard listElement value" id="cachedMemoryValue"></div>
+                        <div class="text value" id="cachedMemoryValue"></div>
                     </div>
                 </div>
             </div>
-            <div class="dashboard innerBlock">
-                <div class="text dashboard innerBlockLabel" data-template-phrase="__dashboard-innerBlock-CPU__"
+            <div class="blockOfContainer lighter withBorders">
+                <div class="text label" data-template-phrase="__dashboard-innerBlock-CPU__"
                      data-type-template-phrase="0"></div>
-                <div class="dashboard list">
-                    <div class="dashboard listElement">
-                        <div class="text dashboard listElement label"
+                <div class="forceBackground list">
+                    <div class="listElement withLabels">
+                        <div class="text label"
                              data-template-phrase="__dashboard-innerBlock-CPU-label-loadCPU__"
                              data-type-template-phrase="0"></div>
-                        <div class="text dashboard listElement value" id="loadCPUValue"></div>
+                        <div class="text value" id="loadCPUValue"></div>
                     </div>
                 </div>
             </div>
-            <div class="dashboard innerBlock">
-                <div class="text dashboard innerBlockLabel" data-template-phrase="__dashboard-innerBlock-disk__"
+            <div class="blockOfContainer lighter withBorders">
+                <div class="text label" data-template-phrase="__dashboard-innerBlock-disk__"
                      data-type-template-phrase="0"></div>
-                <div class="dashboard list">
-                    <div class="text dashboard listElement">
-                        <div class="text dashboard listElement label"
+                <div class="forceBackground list">
+                    <div class="listElement withLabels">
+                        <div class="text label"
                              data-template-phrase="__dashboard-innerBlock-disk-label-partitionType__"
                              data-type-template-phrase="0"></div>
-                        <div class="text dashboard listElement value" id="partitionTypeValue"></div>
+                        <div class="text value" id="partitionTypeValue"></div>
                     </div>
-                    <div class="text dashboard listElement">
-                        <div class="text dashboard listElement label"
+                    <div class="listElement withLabels">
+                        <div class="text label"
                              data-template-phrase="__dashboard-innerBlock-disk-label-totalDiskSize__"
                              data-type-template-phrase="0"></div>
-                        <div class="text dashboard listElement value" id="totalDiskSizeValue"></div>
+                        <div class="text value" id="totalDiskSizeValue"></div>
                     </div>
-                    <div class="text dashboard listElement">
-                        <div class="text dashboard listElement label"
+                    <div class="listElement withLabels">
+                        <div class="text label"
                              data-template-phrase="__dashboard-innerBlock-disk-label-usedDiskSize__"
                              data-type-template-phrase="0"></div>
-                        <div class="text dashboard listElement value" id="usedDiskSizeValue"></div>
+                        <div class="text value" id="usedDiskSizeValue"></div>
                     </div>
-                    <div class="text dashboard listElement">
-                        <div class="text dashboard listElement label"
+                    <div class="listElement withLabels">
+                        <div class="text label"
                              data-template-phrase="__dashboard-innerBlock-disk-label-usedDiskSizeInPercent__"
                              data-type-template-phrase="0"></div>
-                        <div class="text dashboard listElement value" id="usedDiskSizeInPercentValue"></div>
+                        <div class="text value" id="usedDiskSizeInPercentValue"></div>
                     </div>
-                    <div class="text dashboard listElement">
-                        <div class="text dashboard listElement label"
+                    <div class="listElement withLabels">
+                        <div class="text label"
                              data-template-phrase="__dashboard-innerBlock-disk-label-freeDiskSize__"
                              data-type-template-phrase="0"></div>
-                        <div class="text dashboard listElement value" id="freeDiskSizeValue"></div>
+                        <div class="text value" id="freeDiskSizeValue"></div>
                     </div>
                 </div>
             </div>
@@ -123,25 +122,31 @@
     </div>
 </template>
 <template id="template-panelSettings">
-    <div class="panelSettings" id="panelSettings-block">
-        <div class="text panelSettings header" data-template-phrase="__panelSettings-header__"
+    <div class="block littleShadowy panelSettings">
+        <div class="header text" data-template-phrase="__panelSettings-header__"
              data-type-template-phrase="0"></div>
-        <div class="panelSettings content">
-            <div class="panelSettings innerBlock">
-                <input class="formInput innerBlockContent" id="newPortValue" type="number" min="1"
-                       data-template-phrase="__panelSettings-input-newPort__"
+        <div class="blockContent blocksContainer containerColumn">
+            <div class="blockOfContainer">
+                <input class="text" id="newPortValue" type="number" min="1"
+                       data-template-phrase="__panelSettings-field-newPort__"
                        data-type-template-phrase="1"
                        data-parameter="port">
             </div>
-            <div class="panelSettings innerBlock" id="formWithDroppedDynamicList">
-                <input class="formInput innerBlockContent" id="newLanguageValue"
-                       onclick="createList(this.id, this.parentElement.id, [['ru', 'Русский'], ['en', 'English']])"
-                       data-template-phrase="__panelSettings-input-newLanguage__"
+            <div class="blockOfContainer" id="setNewLanguageDroppedList">
+                <input class="text" id="newLanguageValue"
+                       onclick="createList(this.id, 'input', this.parentElement.id, [['ru', 'Русский'], ['en', 'English']])"
+                       data-template-phrase="__panelSettings-field-newLanguage__"
                        data-type-template-phrase="1"
                        data-parameter="language">
             </div>
+            <div class="blockOfContainer" id="switchThemeModeValueDroppedList">
+                <div class="block default text button" id="switchThemeModeValue"
+                       onclick="createList(this.id, 'button', this.parentElement.id, [['auto', 'Автоматически'], ['manual', 'Вручную']]);"
+                       data-template-phrase="__panelSettings-field-switchThemeMode__"
+                       data-type-template-phrase="0"></div>
+            </div>
         </div>
-        <div class="panelSettings footer">
+        <div class="blocksContainer containerRow" style="justify-content: space-between">
             <div class="text footer" id="statusUpdateSettings"></div>
             <div class="button text footer" id="buttonUpdateSettings"
                  onclick="updateSettings(['newPortValue', 'newLanguageValue'])"
@@ -150,18 +155,18 @@
     </div>
 </template>
 <template id="specialTemplate-window">
-    <div class="window" id="window-block">
-        <div class="window header">
-            <div class="text window headerText" id="titleWindow"></div>
-            <div class="button text window headerButton" id="closeWindow" onclick="hideWindow()"
+    <div class="block littleShadowy withBorders containerColumn window">
+        <div class="blocksContainer containerRow header" style="justify-content: space-between">
+            <div class="blockOfContainer text" id="titleWindow" style="margin: 0; padding: 0;"></div>
+            <div class="blockOfContainer text button" id="closeWindow" style="margin: 0; padding: 0;" onclick="hideWindow()"
                  data-template-phrase="__window-header-closeWindow__" data-type-template-phrase="0"></div>
         </div>
-        <div class="text window content"></div>
+        <div class="blockContent text" style="padding: 8px"></div>
     </div>
 </template>
 <template id="specialTemplate-droppedList">
-    <div class="droppedList" id="droppedList-block">
-        <div class="droppedList content list"></div>
+    <div class="block shadowy withBorders droppedList">
+        <div class="blockContent forceBackground droppedList" style="padding: 0;"></div>
     </div>
 </template>
 <template id="specialTemplate-languageTemplates">
@@ -192,8 +197,9 @@
         <div id="ru-dashboard-innerBlock-disk-label-freeDiskSize">Свободно:</div>
 
         <div id="ru-panelSettings-header">Настройки</div>
-        <div id="ru-panelSettings-input-newPort">Изменить порт</div>
-        <div id="ru-panelSettings-input-newLanguage">Изменить язык</div>
+        <div id="ru-panelSettings-field-newPort">Изменить порт</div>
+        <div id="ru-panelSettings-field-newLanguage">Изменить язык</div>
+        <div id="ru-panelSettings-field-switchThemeMode">Изменить переключение темы</div>
         <div id="ru-panelSettings-footer-updateSettings">Сохранить</div>
 
         <div id="ru-window-title-defaultNotification">Уведомление</div>
@@ -230,8 +236,9 @@
         <div id="en-dashboard-innerBlock-disk-label-freeDiskSize">Free:</div>
 
         <div id="en-panelSettings-header">Settings</div>
-        <div id="en-panelSettings-input-newPort">Change port</div>
-        <div id="en-panelSettings-input-newLanguage">Change language</div>
+        <div id="en-panelSettings-field-newPort">Change port</div>
+        <div id="en-panelSettings-field-newLanguage">Change language</div>
+        <div id="en-panelSettings-field-switchThemeMode">Change switch theme mode</div>
         <div id="en-panelSettings-footer-updateSettings">Save</div>
 
         <div id="en-window-title-defaultNotification">Notification</div>

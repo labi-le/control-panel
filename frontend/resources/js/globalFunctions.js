@@ -1,11 +1,11 @@
 let pageBackground = document.querySelector(".background");
 
 function formatBytes(bytes, decimals = 2) {
-    if (bytes === 0) return "0 Bytes";
+    if (bytes === 0) return "0 B";
 
     const k = 1024;
     const dm = decimals < 0 ? 0 : decimals;
-    const sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
+    const sizes = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
 
     const i = Math.floor(Math.log(bytes) / Math.log(k));
 
@@ -17,7 +17,7 @@ function showWindow(type, content) {
 
     let windowTemplate = document.querySelector("#specialTemplate-window").content.cloneNode(true);
 
-    windowTemplate.querySelector(".window.content").innerHTML = content;
+    windowTemplate.querySelector(".blockContent").innerHTML = content;
 
     switch (type) {
 
@@ -48,8 +48,8 @@ function setContent(page) {
         showWindow(null, getTextByTemplatePhrase(localStorage.getItem("nowLanguage"), "window-content-undefinedPage"));
     } else {
         localStorage.setItem("nowPage", page);
-        document.querySelector(".mainView.content").innerHTML = "";
-        document.querySelector(".mainView.content").append(document.querySelector(`#template-${page}`).content.cloneNode(true));
+        document.getElementById("mainApp").innerHTML = "";
+        document.getElementById("mainApp").append(document.querySelector(`#template-${page}`).content.cloneNode(true));
     }
 }
 
@@ -72,64 +72,74 @@ function changeTheme(toTheme) {
 
     if (toTheme === "white") {
         localStorage.setItem("nowTheme", "white");
-        document.documentElement.style.setProperty("--themeFirstLayerColor", "#AEAEAE");
-        document.documentElement.style.setProperty("--themeSecondLayerColor", "#B8B8B8");
-        document.documentElement.style.setProperty("--themeSecondLayerBlocksColor", "#BCBCBC");
-        document.documentElement.style.setProperty("--themeSecondLayerBlocksFieldColor", "#C0C0C0");
-        document.documentElement.style.setProperty("--themeThirdLayerColor", "#B4B4B4");
-        document.documentElement.style.setProperty("--themeFourthLayerColor", "#B2B2B2");
-        document.documentElement.style.setProperty("--themeFourthLayerColorShadow", "#B6B6B6");
+        document.documentElement.style.setProperty("--themeBlockLighterColor", "#BCBCBC");
+        document.documentElement.style.setProperty("--themeBlockDefaultColor", "#B8B8B8");
+        document.documentElement.style.setProperty("--themeBlockLittleShadowyColor", "#AEAEAE");
+        document.documentElement.style.setProperty("--themeBlockShadowyColor", "#B4B4B4");
+        document.documentElement.style.setProperty("--themeListBlockColor", "#B6B6B6");
+        document.documentElement.style.setProperty("--themeListElementShadow", "#B0B0B0");
+        document.documentElement.style.setProperty("--themeButtonBackground", "#B2B2B2");
+        document.documentElement.style.setProperty("--themeInputBackground", "#C0C0C0");
         document.documentElement.style.setProperty("--themeTextColor", "#000000");
-        document.documentElement.style.setProperty("--themeTextColorShadow", "#5e5e5e");
+        document.documentElement.style.setProperty("--themePlaceholderColor", "#5E5E5E");
     } else {
         localStorage.setItem("nowTheme", "black");
-        document.documentElement.style.setProperty("--themeFirstLayerColor", "#262626");
-        document.documentElement.style.setProperty("--themeSecondLayerColor", "#2A2A2A");
-        document.documentElement.style.setProperty("--themeSecondLayerBlocksColor", "#2E2E2E");
-        document.documentElement.style.setProperty("--themeSecondLayerBlocksFieldColor", "#323232");
-        document.documentElement.style.setProperty("--themeThirdLayerColor", "#202020");
-        document.documentElement.style.setProperty("--themeFourthLayerColor", "#242424");
-        document.documentElement.style.setProperty("--themeFourthLayerColorShadow", "#2C2C2C");
+        document.documentElement.style.setProperty("--themeBlockLighterColor", "#2E2E2E");
+        document.documentElement.style.setProperty("--themeBlockDefaultColor", "#2A2A2A");
+        document.documentElement.style.setProperty("--themeBlockLittleShadowyColor", "#262626");
+        document.documentElement.style.setProperty("--themeBlockShadowyColor", "#222222");
+        document.documentElement.style.setProperty("--themeListBlockColor", "#2C2C2C");
+        document.documentElement.style.setProperty("--themeListElementShadow", "#282828");
+        document.documentElement.style.setProperty("--themeButtonBackground", "#242424");
+        document.documentElement.style.setProperty("--themeInputBackground", "#323232");
         document.documentElement.style.setProperty("--themeTextColor", "#FFFFFF");
-        document.documentElement.style.setProperty("--themeTextColorShadow", "#a0a0a0");
+        document.documentElement.style.setProperty("--themePlaceholderColor", "#A0A0A0");
     }
 }
 
-function createList(inputElementId, parentElementId, list) {
-    if (document.querySelector(`#${parentElementId}`).querySelector("#droppedList-block") !== null) return;
+function createList(elementId, elementType, parentElementId, list) {
+    if (document.querySelector(`#${parentElementId}`).querySelector(".block.droppedList") !== null) return;
+    document.querySelector(`#${parentElementId}`).onmouseleave = special_eventHandler;
     let listTemplate = document.querySelector("#specialTemplate-droppedList").content.cloneNode(true);
-    listTemplate.querySelector("#droppedList-block").onmouseleave = special_eventHandler;
     for (let i = 0; i < list.length; i++) {
         let div = document.createElement("div");
         div.classList.add("button", "text", "listElement");
         div.dataset.key = list[i][0];
         div.dataset.value = list[i][1];
-        div.dataset.inputElementId = inputElementId;
+        div.dataset.elementId = elementId;
+        div.dataset.elementType = elementType;
         div.onclick = pickElement
         div.innerHTML = list[i][1];
-        listTemplate.querySelector(".droppedList.content").append(div);
+        listTemplate.querySelector(".blockContent").append(div);
     }
     document.querySelector(`#${parentElementId}`).append(listTemplate);
 }
 
 function pickElement() {
-    let inputElement = document.getElementById(this.dataset.inputElementId);
-    inputElement.dataset.value = this.dataset.key;
-    inputElement.value = this.dataset.value;
+    let element = document.getElementById(this.dataset.elementId);
+    element.dataset.value = this.dataset.key;
+    switch (this.dataset.elementType) {
+        case "input":
+            element.value = this.dataset.value;
+            break;
+        case "button":
+            element.innerHTML = this.dataset.value;
+            break;
+    }
     removeList();
 }
 
 function removeList() {
-    document.querySelector(".droppedList#droppedList-block").remove();
+    //document.querySelector(".droppedList").remove();
 }
 
 function changeLanguage(lang) {
     let languages = document.querySelector("#specialTemplate-languageTemplates").content.cloneNode(true);
-    let elements = document.querySelectorAll("title, template, div.text, input.formInput");
+    let elements = document.querySelectorAll("title, template, div.text, input");
     if (languages.querySelector(`#${lang}-language`) === null) return;
     elements.forEach((element) => {
         if (element.content !== undefined) {
-            element.content.querySelectorAll("div.text, input.formInput").forEach((templateElement) => {
+            element.content.querySelectorAll("div.text, input").forEach((templateElement) => {
                 if (templateElement.dataset.templatePhrase !== undefined) setTextInElement(templateElement, templateElement.dataset.typeTemplatePhrase);
             });
         } else {
@@ -174,10 +184,16 @@ function updateSettings(listOfElementsId) {
     });
 }
 
+function replaceClass(element, replacement, replace) {
+    let containsReplacement = element.classList.contains(replacement)
+    element.className.replace(containsReplacement ? replacement : replace, containsReplacement ? replace : replacement)
+}
+
 function special_eventHandler(event) {
     switch (event.type) {
         case "mouseleave":
             removeList();
+            replaceClass(event.path[1], "opened", "closed");
             break;
     }
 }

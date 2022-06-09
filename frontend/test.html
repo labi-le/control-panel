@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title data-template-phrase="__panelName__" data-type-template-phrase="0"></title>
+    <link href="resources/css/globalStyles.css" rel="stylesheet">
+    <link href="resources/css/page_dashboard.css" rel="stylesheet">
+    <link href="resources/css/page_panelSettings.css" rel="stylesheet">
+</head>
+<body>
+<div class="block shadowy leftPanel">
+    <div class="blockContent header text" data-template-phrase="__panelName__" data-type-template-phrase="0"></div>
+    <div class="blockContent forceBackground content list">
+        <div class="button text listElement" onclick="setContent('dashboard'); initDashboard();"
+             data-template-phrase="__dashboard__" data-type-template-phrase="0"></div>
+        <div class="button text listElement" onclick="setContent('manageDomains')"
+             data-template-phrase="__manageDomains__" data-type-template-phrase="0"></div>
+        <div class="button text listElement" onclick="setContent('manageMails')" data-template-phrase="__manageMails__"
+             data-type-template-phrase="0"></div>
+        <div class="button text listElement" onclick="setContent('manageDatabases')"
+             data-template-phrase="__manageDatabases__" data-type-template-phrase="0"></div>
+        <div class="button text listElement" onclick="setContent('panelSettings')"
+             data-template-phrase="__panelSettings__" data-type-template-phrase="0"></div>
+    </div>
+    <div class="blockContent button text footer" id="footer-changeTheme"
+         onclick="changeTheme(null); localStorage.setItem('changeTheme', 'manual');"
+         data-template-phrase="__leftPanel-footer__" data-type-template-phrase="0"></div>
+</div>
+<div class="block mainView">
+    <div class="blockContent shadowy header text">&#8203;</div>
+    <div class="blockContent content" id="mainApp"></div>
+    <div class="blockContent shadowy footer text" id="footer-version">&#8203;</div>
+</div>
+<div class="background"></div>
+</body>
+<script src="resources/js/index.js"></script>
+<script src="resources/js/globalFunctions.js"></script>
+
+<script type="text/babel">
+
+    function App() {
+        return (
+            <Dashboard header="Состояние сервера" content={{"blocks": [{"blockLabel": "Память",
+                    "blockContent": {
+                        "listType": "withLabels",
+                        "listElements": [
+                            ["Всего", formatBytes(0)],
+                            ["Используется", formatBytes(0)],
+                            ["Свободно", formatBytes(0)],
+                            ["Кэшировано", formatBytes(0)]
+                        ]
+                    }
+                }, {"blockLabel": "Процессор",
+                    "blockContent": {
+                        "listType": "withLabels",
+                        "listElements": [["Нагрузка", "0%"]]
+                    }
+                }, {"blockLabel": "Диск",
+                    "blockContent": {
+                        "listType": "withLabels",
+                        "listElements": [
+                            ["Тип раздела", "null null"],
+                            ["Всего", formatBytes(0)],
+                            ["Используется", formatBytes(0)],
+                            ["Используется (%)", "0%"],
+                            ["Свободно", formatBytes(0)]
+                        ]
+                    }
+                }]
+            }}/>
+        );
+    }
+
+    class Dashboard extends React.Component {
+        constructor(props) {
+            super(props);
+            this.state = {header: props.header, content: props.content};
+            this.ws = new WebSocket(`ws://${document.location.hostname}:${document.location.port}/ws/dashboard`);
+            this.callbackWebsocket = this.callbackWebsocket.bind(this);
+        }
+
+        callbackWebsocket(open, message, close) {
+            this.ws.onopen = (event) => open(this, event, JSON.stringify({"path": "/"}));
+            this.ws.onmessage = (event) => message(this, event);
+            this.ws.onclose = (event) => close(this, event);
+        }
+
+        componentDidMount() {
+            this.callbackWebsocket(
+                (globalInstance, event, data) => {
+                    event.currentTarget.send(data);
+                }, (globalInstance, event) => {
+                    try {
+                        function objToStrMap(obj) {
+                            let strMap = new Map();
+                            for (let k of Object.keys(obj)) {
+                                strMap.set(k, obj[k]);
+                            }
+                            return strMap;
+                        }
+
+                        let dataDashboard = JSON.parse(event.data)[0];
+
+                        objToStrMap(dataDashboard).forEach((val, key) => {
+                            switch (key) {
+                                case "mem":
+                                    // update memory block content
+                                    globalInstance.setState({});
+                                    break;
+                                case "cpu_load":
+                                    // update cpu block content
+                                    globalInstance.setState({});
+                                    break;
+                                case "io":
+                                    // update disk block content
+                                    globalInstance.setState({});
+                                    break;
+                                default:
+                                    console.log("Undefined key: " + key);
+                                    break;
+                            }
+                        })
+
+                        // working function
+                        globalInstance.setState({
+                            content: {"blocks": [{"blockType": "mem", "blockLabel": "Память",
+                                    "blockContent": {
+                                        "listType": "withLabels",
+                                        "listElements": [
+                                            ["Всего", formatBytes(dataDashboard.mem.total)],
+                                            ["Используется", formatBytes(dataDashboard.mem.used)],
+                                            ["Свободно", formatBytes(dataDashboard.mem.free)],
+                                            ["Кэшировано", formatBytes(dataDashboard.mem.cached)]
+                                        ]
+                                    }
+                                }, {"blockLabel": "Процессор",
+                                    "blockContent": {
+                                        "listType": "withLabels",
+                                        "listElements": [["Нагрузка", `${parseFloat(dataDashboard.cpu_load.load).toFixed(2)}%`]]
+                                    }
+                                }, {"blockLabel": "Диск",
+                                    "blockContent": {
+                                        "listType": "withLabels",
+                                        "listElements": [
+                                            ["Тип раздела", `${dataDashboard.io.fstype} ${dataDashboard.io.path}`],
+                                            ["Всего", formatBytes(dataDashboard.io.total)],
+                                            ["Используется", formatBytes(dataDashboard.io.used)],
+                                            ["Используется (%)", `${parseFloat(dataDashboard.io.usedPercent).toFixed(2)}%`],
+                                            ["Свободно", formatBytes(dataDashboard.io.free)]
+                                        ]
+                                    }
+                                }]
+                            }
+                        });
+                    } catch (e) {
+                        showWindow("default", "Возникла ошибка: "+e.toString());
+                        event.currentTarget.close();
+                    }
+                }, (globalInstance, event) => {
+                    showWindow("default", "Возникла ошибка при обработке запроса, попробуйте перезагрузить страницу");
+                    event.currentTarget.close();
+                }
+            );
+        }
+
+        componentWillUnmount() {
+            this.ws.close();
+        }
+
+        Header() {
+            return (
+                <div className="header text">{this.state.header}</div>
+            );
+        }
+        Content() {
+            function Block(props) {
+                function BlockLabel() {
+                    return (
+                        <div className="text label">{props.blockLabel}</div>
+                    )
+                }
+                function BlockContent() {
+                    return (
+                        <ListElements listType={props.listType} listElements={props.listElements}/>
+                    )
+                }
+                return (
+                    <div className="blockOfContainer lighter withBorders">
+                        <BlockLabel/>
+                        <BlockContent/>
+                    </div>
+                )
+            }
+            let blocksList = this.state.content.blocks.map((block, index) => {
+                return (<Block key={index} blockLabel={block.blockLabel} listType={block.blockContent.listType} listElements={block.blockContent.listElements}/>);
+            })
+            return (
+                <div className="blockContent blocksContainer containerRow">{blocksList}</div>
+            )
+        }
+
+        render() {
+            return (
+                <div className="block littleShadowy dashboard">
+                    {this.Header()}
+                    {this.Content()}
+                </div>
+            );
+        }
+    }
+
+    function ListElements(props) {
+        function ListElement(props) {
+            return (
+                <div className={`text listElement ${listType}`}>{props.text}</div>
+            )
+        }
+        function ListElementWithLabel(props) {
+            function ListElementLabel() {
+                return (
+                    <div className="text blockContent listElement label">{props.labelText}</div>
+                )
+            }
+            function ListElementValue() {
+                return (
+                    <div className="text blockContent listElement value">{props.valueText}</div>
+                )
+            }
+            return (
+                <div className={`blockContent listElement ${listType}`}>
+                    <ListElementLabel/>
+                    <ListElementValue/>
+                </div>
+            )
+        }
+        let listType = props.listType;
+        let elements = props.listElements;
+        let elementsList = elements.map((element, index) => {
+            if (listType === "withLabels") return (<ListElementWithLabel key={index} labelText={element[0]} valueText={element[1]}/>);
+            if (listType === "default") return (<ListElement key={index} text={element}/>);
+        });
+        return (
+            <div className={`blockContent forceBackground list`}>{elementsList}</div>
+        )
+    }
+
+    ReactDOM.render(
+        <App/>,
+        document.getElementById('mainApp')
+    );
+</script>
+<template id="template-panelSettings">
+    <div class="block littleShadowy panelSettings">
+        <div class="header text" data-template-phrase="__panelSettings-header__"
+             data-type-template-phrase="0"></div>
+        <div class="blockContent blocksContainer containerColumn">
+            <div class="blockOfContainer">
+                <input class="text" id="newPortValue" type="number" min="1"
+                       data-template-phrase="__panelSettings-field-newPort__"
+                       data-type-template-phrase="1"
+                       data-parameter="port">
+            </div>
+            <div class="blockOfContainer" id="setNewLanguageDroppedList">
+                <input class="text" id="newLanguageValue"
+                       onclick="createList(this.id, 'input', this.parentElement.id, [['ru', 'Русский'], ['en', 'English']])"
+                       data-template-phrase="__panelSettings-field-newLanguage__"
+                       data-type-template-phrase="1"
+                       data-parameter="language">
+            </div>
+            <div class="blockOfContainer" id="switchThemeModeValueDroppedList">
+                <div class="block default text button" id="switchThemeModeValue"
+                     onclick="createList(this.id, 'button', this.parentElement.id, [['auto', 'Автоматически'], ['manual', 'Вручную']]);"
+                     data-template-phrase="__panelSettings-field-switchThemeMode__"
+                     data-type-template-phrase="0"></div>
+            </div>
+        </div>
+        <div class="blocksContainer containerRow" style="justify-content: space-between">
+            <div class="text footer" id="statusUpdateSettings"></div>
+            <div class="button text footer" id="buttonUpdateSettings"
+                 onclick="updateSettings(['newPortValue', 'newLanguageValue'])"
+                 data-template-phrase="__panelSettings-footer-updateSettings__" data-type-template-phrase="0"></div>
+        </div>
+    </div>
+</template>
+<template id="specialTemplate-window">
+    <div class="block littleShadowy withBorders containerColumn window">
+        <div class="blocksContainer containerRow header" style="justify-content: space-between">
+            <div class="blockOfContainer text" id="titleWindow" style="margin: 0; padding: 0;"></div>
+            <div class="blockOfContainer text button" id="closeWindow" style="margin: 0; padding: 0;" onclick="hideWindow()"
+                 data-template-phrase="__window-header-closeWindow__" data-type-template-phrase="0"></div>
+        </div>
+        <div class="blockContent text" style="padding: 8px"></div>
+    </div>
+</template>
+<template id="specialTemplate-droppedList">
+    <div class="block shadowy withBorders droppedList">
+        <div class="blockContent forceBackground droppedList" style="padding: 0;"></div>
+    </div>
+</template>
+<template id="specialTemplate-languageTemplates">
+    <div id="ru-language">
+        <div id="ru-panelName">Панель управления</div>
+
+        <div id="ru-dashboard">Состояние сервера</div>
+        <div id="ru-manageDomains">Управление доменами</div>
+        <div id="ru-manageMails">Управление почтой</div>
+        <div id="ru-manageDatabases">Управление базами данных</div>
+        <div id="ru-panelSettings">Настройки панели</div>
+
+        <div id="ru-leftPanel-footer">Сменить тему</div>
+
+        <div id="ru-dashboard-header">Общая статистика</div>
+        <div id="ru-dashboard-innerBlock-memory">Память</div>
+        <div id="ru-dashboard-innerBlock-memory-label-totalMemory">Всего:</div>
+        <div id="ru-dashboard-innerBlock-memory-label-usedMemory">Используется:</div>
+        <div id="ru-dashboard-innerBlock-memory-label-freeMemory">Свободно:</div>
+        <div id="ru-dashboard-innerBlock-memory-label-cachedMemory">Кэшировано:</div>
+        <div id="ru-dashboard-innerBlock-CPU">Процессор</div>
+        <div id="ru-dashboard-innerBlock-CPU-label-loadCPU">Нагрузка:</div>
+        <div id="ru-dashboard-innerBlock-disk">Диск</div>
+        <div id="ru-dashboard-innerBlock-disk-label-partitionType">Тип раздела:</div>
+        <div id="ru-dashboard-innerBlock-disk-label-totalDiskSize"> Всего:</div>
+        <div id="ru-dashboard-innerBlock-disk-label-usedDiskSize">Используется:</div>
+        <div id="ru-dashboard-innerBlock-disk-label-usedDiskSizeInPercent">Используется (%):</div>
+        <div id="ru-dashboard-innerBlock-disk-label-freeDiskSize">Свободно:</div>
+
+        <div id="ru-panelSettings-header">Настройки</div>
+        <div id="ru-panelSettings-field-newPort">Изменить порт</div>
+        <div id="ru-panelSettings-field-newLanguage">Изменить язык</div>
+        <div id="ru-panelSettings-field-switchThemeMode">Изменить переключение темы</div>
+        <div id="ru-panelSettings-footer-updateSettings">Сохранить</div>
+
+        <div id="ru-window-title-defaultNotification">Уведомление</div>
+        <div id="ru-window-title-showTask">Просмотр задачи</div>
+        <div id="ru-window-header-closeWindow">Закрыть</div>
+        <div id="ru-window-content-undefinedPage">Неизвестная страница</div>
+
+        <div id="ru-bug">Ошибка перевода</div>
+    </div>
+    <div id="en-language">
+        <div id="en-panelName">Control panel</div>
+
+        <div id="en-dashboard">Dashboard</div>
+        <div id="en-manageDomains">Manage domains</div>
+        <div id="en-manageMails">Manage mails</div>
+        <div id="en-manageDatabases">Manage databases</div>
+        <div id="en-panelSettings">Panel settings</div>
+
+        <div id="en-leftPanel-footer">Change theme</div>
+
+        <div id="en-dashboard-header">Total stats</div>
+        <div id="en-dashboard-innerBlock-memory">Memory</div>
+        <div id="en-dashboard-innerBlock-memory-label-totalMemory">Total:</div>
+        <div id="en-dashboard-innerBlock-memory-label-usedMemory">Used:</div>
+        <div id="en-dashboard-innerBlock-memory-label-freeMemory">Free:</div>
+        <div id="en-dashboard-innerBlock-memory-label-cachedMemory">Cached:</div>
+        <div id="en-dashboard-innerBlock-CPU">CPU</div>
+        <div id="en-dashboard-innerBlock-CPU-label-loadCPU">Load:</div>
+        <div id="en-dashboard-innerBlock-disk">Disk</div>
+        <div id="en-dashboard-innerBlock-disk-label-partitionType">Partition type:</div>
+        <div id="en-dashboard-innerBlock-disk-label-totalDiskSize">Total:</div>
+        <div id="en-dashboard-innerBlock-disk-label-usedDiskSize">Used:</div>
+        <div id="en-dashboard-innerBlock-disk-label-usedDiskSizeInPercent">Used (%):</div>
+        <div id="en-dashboard-innerBlock-disk-label-freeDiskSize">Free:</div>
+
+        <div id="en-panelSettings-header">Settings</div>
+        <div id="en-panelSettings-field-newPort">Change port</div>
+        <div id="en-panelSettings-field-newLanguage">Change language</div>
+        <div id="en-panelSettings-field-switchThemeMode">Change switch theme mode</div>
+        <div id="en-panelSettings-footer-updateSettings">Save</div>
+
+        <div id="en-window-title-defaultNotification">Notification</div>
+        <div id="en-window-title-showTask">Task viewer</div>
+        <div id="en-window-header-closeWindow">Close</div>
+        <div id="en-window-content-undefinedPage">Undefined page</div>
+
+        <div id="en-bug">Translate error</div>
+    </div>
+</template>
+
+<script crossorigin src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script crossorigin src="https://unpkg.com/react@17/umd/react.development.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.23/browser.min.js"></script>
+</html>

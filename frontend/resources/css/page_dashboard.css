@@ -1,41 +1,8 @@
-.dashboard#dashboard-block {
+.block.dashboard {
     display: inline-flex;
     flex-direction: column;
     flex-wrap: wrap;
-    background: var(--themeSecondLayerColor);
-    border: 4px solid var(--themeSecondLayerColor);
     border-radius: 8px;
     padding: 4px;
-}
-
-.dashboard.header {
-    background: inherit;
-    text-align: center;
-}
-
-.dashboard.blocksContainer {
-    display: flex;
-    justify-items: baseline;
-    justify-content: center;
-    flex-wrap: wrap;
-    background: inherit;
-}
-
-.dashboard.innerBlock {
-    display: flex;
-    flex-direction: column;
-    background: var(--themeSecondLayerBlocksColor);
-    border-radius: 8px;
-    padding: 12px;
     margin: 8px;
-}
-
-.dashboard.innerBlockLabel {
-    padding: 4px 0;
-    text-align: center;
-}
-
-.dashboard.listElement {
-    display: flex;
-    justify-content: space-between;
 }

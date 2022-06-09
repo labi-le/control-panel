@@ -1,35 +1,8 @@
-.panelSettings {
+.block.panelSettings {
     display: inline-flex;
     flex-direction: column;
     flex-wrap: wrap;
-    background: var(--themeSecondLayerColor);
-    border: 4px solid var(--themeSecondLayerColor);
     border-radius: 8px;
     padding: 4px;
-}
-
-.panelSettings.header {
-    text-align: center;
-}
-
-.panelSettings.content {
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: column;
-    padding: 0;
-}
-
-.panelSettings.innerBlock {
-    padding: 0;
-}
-
-.panelSettings.innerBlockContent {
-    padding: 0;
-}
-
-.panelSettings.footer {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    padding: 0 8px;
+    margin: 8px;
 }

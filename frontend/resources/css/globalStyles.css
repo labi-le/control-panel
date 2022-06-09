@@ -1,27 +1,26 @@
 @import url(https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700&display=swap);
 
 :root {
-    /*
-     * 1st layer - backgrounds
-     * 2nd layer - any active blocks and contents of him
-     * 3rd layer - panels (header, footer, etc.)
-     * 4st layer - special window (notifications, lists, etc.)
-     */
-    --themeFirstLayerColor: #262626;
-    --themeSecondLayerColor: #2A2A2A;
-    --themeSecondLayerBlocksColor: #2E2E2E;
-    --themeSecondLayerBlocksFieldColor: #323232;
-    --themeThirdLayerColor: #202020;
-    --themeFourthLayerColor: #242424;
-    --themeFourthLayerColorShadow: #2C2C2C;
+
+    --themeBlockLighterColor: #2E2E2E;
+    --themeBlockDefaultColor: #2A2A2A;
+    --themeBlockLittleShadowyColor: #262626;
+    --themeBlockShadowyColor: #222222;
+
+    --themeListBlockColor: #2C2C2C;
+    --themeListElementShadow: #282828;
+    --themeButtonBackground: #242424;
+    --themeInputBackground: #323232;
+
     --themeTextColor: #FFFFFF;
-    --themeTextColorShadow: #a0a0a0;
+    --themePlaceholderColor: #A0A0A0;
 }
 
 html {
     height: 100%;
     margin: 0;
     padding: 0;
+    background: var(--themeBlockDefaultColor);
 }
 
 body {
@@ -31,39 +30,119 @@ body {
     padding: 0;
 }
 
+input {
+    background: var(--themeInputBackground) !important;
+    color: var(--themeTextColor) !important;
+    border: none;
+    border-radius: 8px;
+    outline: none;
+    padding: 8px;
+    width: calc(100% - 16px);
+}
+
 .header {
     padding: 8px;
-    background: var(--themeThirdLayerColor);
     text-align: center;
 }
 
 .content {
     flex-grow: 1;
-    background: var(--themeFirstLayerColor);
+    padding: 8px;
 }
 
-.footerText {
+.footer {
     padding: 8px;
-    background: var(--themeThirdLayerColor);
     text-align: center;
 }
 
+.block {
+    padding: 4px;
+}
+
+.blockOfContainer {
+    padding: 4px;
+    margin: 4px 4px;
+}
+
+.lighter {
+    background: var(--themeBlockLighterColor) !important;
+}
+
+.default:not(.listElement) {
+    background: var(--themeBlockDefaultColor) !important;
+}
+
+.littleShadowy {
+    background: var(--themeBlockLittleShadowyColor) !important;
+}
+
+.shadowy {
+    background: var(--themeBlockShadowyColor) !important;
+}
+
+.withBorders {
+    border-radius: 4px;
+}
+
+.blockContent * {
+    background: inherit;
+}
+
+.forceBackground {
+    background: inherit !important;
+}
+
+.blocksContainer {
+    display: flex;
+}
+
+.containerRow {
+    flex-direction: row;
+}
+
+.containerColumn {
+    flex-direction: column;
+}
+
 .button {
+    padding: 8px;
+    border: none;
+    border-radius: 8px;
     cursor: pointer;
+}
+
+.label {
+    padding: 4px 2px;
+    text-align: center;
+}
+
+.value {
+    padding: 4px 2px;
+    text-align: center;
 }
 
 .list {
     display: flex;
     flex-direction: column;
+    background: var(--themeListBlockColor);
+}
+
+.listElement.default {
+    padding: 8px;
+}
+
+.listElement.withLabels {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px;
 }
 
 .listElement, .listElement:hover {
-    padding: 4px;
     border-radius: 4px;
 }
 
 .listElement:hover {
-    background: var(--themeFourthLayerColorShadow);
+    background: var(--themeListElementShadow);
 }
 
 .text, ::placeholder {
@@ -73,71 +152,14 @@ body {
 }
 
 ::placeholder {
-    color: var(--themeTextColorShadow);
+    color: var(--themePlaceholderColor);
 }
 
-.formInput {
-    background: var(--themeSecondLayerBlocksFieldColor);
-    color: var(--themeTextColor);
-    border: none;
-    border-radius: 8px;
-    outline: none;
-    padding: 8px;
-    font-family: system-ui;
-    font-weight: bold;
-}
-
-.leftPanel#leftPanel-block {
-    display: flex;
-    flex-direction: column;
-    background: var(--themeThirdLayerColor);
-    padding: 0 8px;
-    white-space: nowrap;
-}
-
-.leftPanel.header {
-    /* some styles */
-}
-
-.leftPanel.content {
-    background: inherit;
-}
-
-.leftPanel.footerText {
-    /* some styles */
-}
-
-.mainView#mainView-block {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-}
-
-.mainView.header {
-    /* some styles */
-}
-
-.mainView.content {
-    padding: 16px;
-}
-
-.mainView.footerText {
-    /* some styles */
-}
-
-.droppedList#droppedList-block {
-    position: absolute;
-    z-index: 2;
-    min-width: 220px;
-    margin-top: 36px;
-}
-
-.droppedList.content {
-    padding: 4px;
-    border: none;
-    border-radius: 8px;
-    background: var(--themeFourthLayerColor);
+.block.droppedList {
     margin-top: 4px;
+}
+
+.droppedList.blockContent {
     text-align: center;
 }
 
@@ -160,38 +182,11 @@ body {
     pointer-events: all;
 }
 
-.window#window-block {
+.block.window {
     display: flex;
-    flex-direction: column;
-    background: var(--themeFourthLayerColor);
-    padding: 24px;
-    border-radius: 6px;
+    padding: 16px;
     min-width: 20%;
     max-width: 30%;
-}
-
-.window.header {
-    display: flex;
-    justify-content: space-between;
-    padding: 0;
-    background: inherit;
-}
-
-.window.headerText#titleWindow {
-    padding-right: 4px;
-}
-
-.window.headerButton#closeWindow {
-    padding-left: 4px;
-}
-
-.window.content {
-    margin-top: 4px;
-    background: inherit;
-}
-
-.window.footer {
-    /* some styles */
 }
 
 .window.footer.loader {
@@ -207,4 +202,20 @@ body {
 @keyframes spinner {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+/* END GLOBAL STYLES, START STYLES OF PAGES */
+
+.block.leftPanel {
+    display: flex;
+    flex-direction: column;
+    white-space: nowrap;
+    padding: 0;
+}
+
+.block.mainView {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    flex-grow: 1;
 }
