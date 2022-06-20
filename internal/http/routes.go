@@ -3,21 +3,19 @@ package http
 import (
 	"github.com/labi-le/control-panel/internal"
 	"github.com/labi-le/control-panel/internal/http/api"
+	"github.com/labi-le/control-panel/pkg/utils"
 	"github.com/labstack/echo/v4"
 	"net/http"
-	"time"
 )
 
 func GetRoutes(m *api.Methods) *echo.Echo {
 	e := echo.New()
 
-	e.Static("/", "./frontend/")
-	e.Router().Add(http.MethodGet, "/", func(c echo.Context) error {
-		c.Response().Header().Set("Version", internal.PanelVersion)
-		c.Response().Header().Set("Date", time.Now().Format(time.RFC3339Nano))
-
-		return c.File("./frontend/index.html")
-	})
+	if utils.IsDirExist(internal.ProductionStaticPath) {
+		e.Static("/", internal.ProductionStaticPath)
+	} else {
+		e.Static("/", internal.DevelopStaticPath)
+	}
 
 	e.Router().Add(http.MethodGet, "/ws/dashboard", m.GetDashboardInfo)
 	e.Router().Add(http.MethodGet, "/ws/package/update", m.UpdatePackage)
