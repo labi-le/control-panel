@@ -23,6 +23,9 @@ const (
 	DefaultAddr                   = "0.0.0.0"
 	DefaultPort                   = "7777"
 	DefaultDashboardUpdateTimeout = time.Second * 1
+
+	ProductionStaticPath = "/opt/control-panel/static/"
+	DevelopStaticPath    = "./frontend/"
 )
 
 // PanelSettings
