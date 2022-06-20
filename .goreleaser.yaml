@@ -45,8 +45,8 @@ nfpms:
     dependencies:
       - "apt"
     contents:
-      - src: ./frontend/
-        dst: "/opt/{{ .ProjectName }}/frontend/"
+      - src: "./frontend/"
+        dst: "/opt/{{ .ProjectName }}/static/"
         type: resource
     scripts:
       postremove: scripts/postremove.sh
