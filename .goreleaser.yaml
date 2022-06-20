@@ -42,14 +42,12 @@ nfpms:
     maintainer: "github.com/labi-le/control-panel/graphs/contributors"
     section: "default"
     priority: "extra"
+    dependencies:
+      - "apt"
     contents:
-      - src: dist/control-panel_linux_amd64/control-panel
-        dst: /opt/control-panel/panel
       - src: ./frontend/
-        dst: /opt/control-panel/frontend
-      - src: /opt/control-panel/panel
-        dst: /sbin/control-panel
-        type: symlink
+        dst: "/opt/{{ .ProjectName }}/frontend/"
+        type: resource
     scripts:
       postremove: scripts/postremove.sh
       postinstall: scripts/postinstall.sh
