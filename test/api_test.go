@@ -33,7 +33,7 @@ func TestMethods_GetVersion(t *testing.T) {
 		t.Error(err)
 	}
 
-	assert.Equal(t, internal.PanelVersion, v.V)
+	assert.Equal(t, internal.Version, v.V)
 }
 
 func TestMethods_GetDiskPartitions(t *testing.T) {

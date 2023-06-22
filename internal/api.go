@@ -69,7 +69,7 @@ func (a *API) badResponseWS(ws *websocket.Conn, err error) bool {
 }
 
 func (a *API) GetVersion(c *fiber.Ctx) error {
-	return a.reply.OK(c, types.Version{V: PanelVersion})
+	return a.reply.OK(c, types.Version{V: Version})
 }
 
 func (a *API) GetDashboardInfo(ws *websocket.Conn) {

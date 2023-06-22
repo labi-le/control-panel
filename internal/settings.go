@@ -10,8 +10,6 @@ import (
 )
 
 const (
-	PanelVersion = "0.0.1"
-
 	ProductionStaticPath = "/opt/control-panel/static/"
 	DevelopStaticPath    = "./frontend/"
 	DefaultConfigName    = "config.toml"
