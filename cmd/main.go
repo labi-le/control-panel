@@ -34,7 +34,7 @@ func main() {
 
 	configureLogger(conf)
 
-	log.Info().Msgf("Version: %s", internal.BuildVersion())
+	log.Info().Msg(internal.BuildVersion())
 
 	checkPermissions()
 

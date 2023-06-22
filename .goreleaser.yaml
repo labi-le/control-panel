@@ -4,7 +4,7 @@ before:
 
 builds:
   - env:
-      - CGO_ENABLED=1
+      - CGO_ENABLED=0
     goos:
       - linux
     goarch:
@@ -12,15 +12,12 @@ builds:
     dir: cmd
 
     ldflags:
-      - '-linkmode external'
+      - '-X github.com/labi-le/control-panel/internal.Version={{ .Tag }}'
+      - '-X github.com/labi-le/control-panel/internal.BuildTime={{ .Date }}'
+      - '-X github.com/labi-le/control-panel/internal.CommitHash={{ .Commit }}'
       - '-extldflags "-static"'
-      - -s
     flags:
       - -v
-archives:
-  - replacements:
-      linux: Linux
-      amd64: x86_64
 checksum:
   name_template: 'checksums.txt'
 snapshot:
@@ -47,7 +44,7 @@ nfpms:
     contents:
       - src: "./frontend/"
         dst: "/opt/{{ .ProjectName }}/static/"
-        type: resource
+        type: dir
     scripts:
       postremove: scripts/postremove.sh
       postinstall: scripts/postinstall.sh
