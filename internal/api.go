@@ -1,7 +1,6 @@
 package internal
 
 import (
-	"encoding/json"
 	"errors"
 	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
@@ -41,9 +40,6 @@ func RegisterHandlers(
 	r.Add(http.MethodGet, "/ws/package/install/:package", api.InstallPackage)
 	r.Add(http.MethodGet, "/ws/package/remove/:package", api.DeletePackage)
 
-	r.Add(http.MethodGet, "/api/settings", api.GetSettings)
-	r.Add(http.MethodPut, "/api/settings", api.UpdateSettings)
-	r.Add(http.MethodGet, "/api/settings/reset", api.ResetSettings)
 	r.Add(http.MethodGet, "/api/disk_partitions", api.GetDiskPartitions)
 	r.Add(http.MethodGet, "/api/version", api.GetVersion)
 }
@@ -107,7 +103,7 @@ func (a *API) GetDashboardInfo(ws *websocket.Conn) {
 			break
 		}
 
-		time.Sleep(a.service.DashboardUpdateTimeout)
+		time.Sleep(a.service.DashboardDelay)
 	}
 }
 
@@ -118,40 +114,6 @@ func (a *API) GetDiskPartitions(c *fiber.Ctx) error {
 	}
 
 	return a.reply.OK(c, dp)
-}
-
-func (a *API) GetSettings(c *fiber.Ctx) error {
-	settings, err := a.service.GetSettings()
-	if err != nil {
-		return a.reply.InternalServerError(c, err)
-	}
-
-	return a.reply.OK(c, settings)
-}
-
-func (a *API) UpdateSettings(c *fiber.Ctx) error {
-	s := PanelSettings{}
-
-	err := json.Unmarshal(c.Body(), &s)
-	if err != nil {
-		return a.reply.BadRequest(c, err)
-	}
-
-	err = a.service.UpdateSettings(s)
-	if err != nil {
-		return a.reply.InternalServerError(c, err)
-	}
-
-	return a.reply.OK(c, s)
-}
-
-func (a *API) ResetSettings(c *fiber.Ctx) error {
-	err := a.service.ResetSettings()
-	if err != nil {
-		return a.reply.InternalServerError(c, err)
-	}
-
-	return a.reply.OK(c, DefaultPanelSettings())
 }
 
 func (a *API) UpdatePackage(ctx *fiber.Ctx) error {

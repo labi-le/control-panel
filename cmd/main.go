@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"flag"
+	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/labi-le/control-panel/internal"
 	"github.com/rs/zerolog/log"
@@ -20,7 +21,7 @@ var (
 
 func init() {
 	flag.BoolVar(&debugMode, "debug", false, "debug mode")
-	flag.StringVar(&config, "config", internal.DefaultConfigPath, "path to config file")
+	flag.StringVar(&config, "config", internal.DefaultConfigPath(), "path to config file")
 	flag.BoolVar(&versionFlag, "version", false, "print version and exit")
 }
 
@@ -47,7 +48,7 @@ func main() {
 	internal.RegisterHandlers(srv, conf)
 
 	go func() {
-		err := srv.Listen(conf.GetAddr() + ":" + conf.GetPort())
+		err := srv.Listen(fmt.Sprintf("%s:%d", conf.GetAddr(), conf.GetPort()))
 		if err != nil {
 			log.Fatal().Err(err)
 		}

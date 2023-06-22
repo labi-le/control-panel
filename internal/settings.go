@@ -17,6 +17,14 @@ const (
 	DefaultConfigName    = "config.toml"
 )
 
+type Config interface {
+	GetAddr() string
+	GetPort() int
+	GetLogLevel() string
+	GetLanguage() string
+	GetDashboardUpdateTimeout() time.Duration
+}
+
 // PanelSettings
 // port - the port on which the panel will work
 // logLevel - the debug level of the panel
@@ -106,7 +114,7 @@ func DefaultPanelSettings() *PanelSettings {
 // String returns config as string
 func (p *PanelSettings) String() string {
 	return fmt.Sprintf(
-		"lang: %s\nlog level: %s\naddr: %s\nport: %s",
+		"lang: %s\nlog level: %s\naddr: %s\nport: %d",
 		p.Language,
 		p.LogLevel,
 		p.Addr,
