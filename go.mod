@@ -4,9 +4,11 @@ go 1.18
 
 require (
 	github.com/ShinyTrinkets/overseer v0.4.0
+	github.com/gofiber/contrib/websocket v1.0.0
+	github.com/gofiber/fiber/v2 v2.47.0
 	github.com/google/uuid v1.3.0
 	github.com/korovkin/limiter v0.0.0-20230307205149-3d4b2b34c99d
-	github.com/labstack/echo/v4 v4.7.2
+	github.com/labstack/echo/v4 v4.9.0
 	github.com/mackerelio/go-osstat v0.2.2
 	github.com/shirou/gopsutil/v3 v3.22.4
 	github.com/sirupsen/logrus v1.8.1
@@ -19,14 +21,11 @@ require (
 )
 
 require (
-	github.com/BurntSushi/toml v1.3.2 // indirect
 	github.com/ShinyTrinkets/meta-logger v0.2.0 // indirect
 	github.com/andybalholm/brotli v1.0.5 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fasthttp/websocket v1.5.3 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
-	github.com/gofiber/contrib/websocket v1.0.0 // indirect
-	github.com/gofiber/fiber/v2 v2.47.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/klauspost/compress v1.16.6 // indirect
