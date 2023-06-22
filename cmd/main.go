@@ -7,14 +7,14 @@ import (
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/labi-le/control-panel/internal"
+	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"os"
 	"os/signal"
 )
 
 var (
-	config      string
-	versionFlag bool
+	config string
 	// Режим отладки всего приложения, sql запросы
 	debugMode bool
 )
@@ -22,21 +22,19 @@ var (
 func init() {
 	flag.BoolVar(&debugMode, "debug", false, "debug mode")
 	flag.StringVar(&config, "config", internal.DefaultConfigPath(), "path to config file")
-	flag.BoolVar(&versionFlag, "version", false, "print version and exit")
 }
 
 func main() {
 	flag.Parse()
 
-	if versionFlag == true {
-		log.Info().Msgf("Version: %s", internal.PanelVersion)
-		return
-	}
-
 	conf, err := internal.NewPanelSettings(config)
 	if err != nil {
 		log.Fatal().Err(err)
 	}
+
+	configureLogger(conf)
+
+	log.Info().Msgf("Version: %s", internal.BuildVersion())
 
 	checkPermissions()
 
@@ -61,6 +59,16 @@ func main() {
 		log.Fatal().Err(err)
 	}
 
+}
+
+func configureLogger(conf *internal.PanelSettings) {
+	level, err := zerolog.ParseLevel(conf.LogLevel)
+	if err != nil {
+		log.Warn().Msgf("invalid log level %s, fallback to info", conf.LogLevel)
+		level = zerolog.InfoLevel
+	}
+
+	zerolog.SetGlobalLevel(level)
 }
 
 var ErrPermissionDenied = errors.New("permission denied")
