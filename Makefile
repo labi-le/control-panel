@@ -1,25 +1,21 @@
-.PHONY: run
-.DEFAULT_GOAL := run
-
-PROJ_NAME = control-panel
+PACKAGE = control-panel
 
 MAIN_PATH = cmd/main.go
 BUILD_PATH = build/package/
 
+.DEFAULT_GOAL := build
 INSTALL_PATH = /usr/local/bin/
-
-export CGO_ENABLED = 1
 
 run:
 	go run -v $(MAIN_PATH)
 
 build-release: clean
 	@echo "Building..."
-	goreleaser release --rm-dist
+	goreleaser release --clean
 
 build: clean
 	@echo "Building..."
-	goreleaser release --skip-publish --snapshot --rm-dist
+	goreleaser release --skip-publish --snapshot --clean
 
 clean:
 	@echo "Cleaning..."
