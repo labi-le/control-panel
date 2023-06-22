@@ -1,5 +1,5 @@
 language = "en"
 logvel = "info" # trace, debug, info, warn, error, fatal, panic
 port = 7777
-dashboard_delay = 1000
+dashboard_delay = "1s"
 addr = "0.0.0.0"
