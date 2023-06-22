@@ -11,5 +11,5 @@ var (
 )
 
 func BuildVersion() string {
-	return fmt.Sprintf("Version: %s\nCommit hash: %s\nBuild time: %s", Version, CommitHash, BuildTime)
+	return fmt.Sprintf("Version: %s Commit hash: %s Build time: %s", Version, CommitHash, BuildTime)
 }

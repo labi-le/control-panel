@@ -7,7 +7,6 @@ import (
 	"github.com/labi-le/control-panel/internal/types"
 	"github.com/labi-le/control-panel/pkg/response"
 	"github.com/labi-le/control-panel/pkg/utils"
-	"github.com/labstack/echo/v4"
 	"github.com/rs/zerolog/log"
 	"net/http"
 	"syscall"
@@ -110,7 +109,7 @@ func (a *API) GetDashboardInfo(ws *websocket.Conn) {
 func (a *API) GetDiskPartitions(c *fiber.Ctx) error {
 	dp, err := GetDiskPartitions()
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		return a.reply.InternalServerError(c, err)
 	}
 
 	return a.reply.OK(c, dp)
