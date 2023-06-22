@@ -2,7 +2,7 @@ package utils
 
 import (
 	"github.com/ShinyTrinkets/overseer"
-	"github.com/labi-le/control-panel/pkg/log"
+	"github.com/rs/zerolog/log"
 	"io"
 	"time"
 )
@@ -43,8 +43,7 @@ func MonitorState(over *overseer.Overseer, fn func(state *overseer.ProcessJSON) 
 
 	go func() {
 		for state := range status {
-			log.Infof("%v\n", state)
-			fn(state)
+			log.Debug().Msgf("Process state: %s", fn(state))
 		}
 	}()
 }

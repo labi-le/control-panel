@@ -6,10 +6,10 @@ import (
 	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
 	"github.com/labi-le/control-panel/internal/types"
-	"github.com/labi-le/control-panel/pkg/log"
 	"github.com/labi-le/control-panel/pkg/response"
 	"github.com/labi-le/control-panel/pkg/utils"
 	"github.com/labstack/echo/v4"
+	"github.com/rs/zerolog/log"
 	"net/http"
 	"syscall"
 	"time"
@@ -32,7 +32,7 @@ func RegisterHandlers(
 	}
 
 	api := &API{
-		reply:   response.New(log.GlobalLog),
+		reply:   response.New(),
 		service: service,
 	}
 
@@ -51,10 +51,10 @@ func RegisterHandlers(
 func (a *API) successResponseWS(ws *websocket.Conn, d ...any) bool {
 	if err := ws.WriteJSON(d); err != nil {
 		if errors.Is(err, syscall.EPIPE) {
-			log.Infof("Client disconnected %s", ws.RemoteAddr)
+			log.Info().Msgf("Client disconnected %s", ws.RemoteAddr())
 			return false
 		}
-		log.Error(err)
+		log.Error().Err(err)
 
 		return false
 	}
@@ -67,7 +67,7 @@ func (a *API) badResponseWS(ws *websocket.Conn, err error) bool {
 		Message: err.Error(),
 		Data:    []string{},
 	}
-	log.Error(err)
+	log.Error().Err(err)
 
 	return a.successResponseWS(ws, r)
 }
@@ -79,11 +79,11 @@ func (a *API) GetVersion(c *fiber.Ctx) error {
 func (a *API) GetDashboardInfo(ws *websocket.Conn) {
 	defer ws.Close()
 
-	log.Infof("Client connected %s", ws.RemoteAddr)
+	log.Info().Msgf("Client connected %s", ws.RemoteAddr())
 
 	var dashboard types.DashboardParams
 	if err := ws.ReadJSON(&dashboard); err != nil {
-		log.Error(err)
+		log.Error().Err(err)
 		return
 	}
 

@@ -2,7 +2,7 @@ package response
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/labi-le/control-panel/pkg/log"
+	"github.com/rs/zerolog/log"
 	"net/http"
 )
 
@@ -16,14 +16,13 @@ type Success struct {
 
 // Reply is a helper for responses
 type Reply struct {
-	l log.Logger
 }
 
-func New(l log.Logger) *Reply {
-	return &Reply{l: l}
+func New() *Reply {
+	return &Reply{}
 }
 
-func request(ctx *fiber.Ctx, l log.Logger, status int, data interface{}) error {
+func request(ctx *fiber.Ctx, status int, data interface{}) error {
 	var (
 		rStruct interface{}
 		msg     string
@@ -48,7 +47,7 @@ func request(ctx *fiber.Ctx, l log.Logger, status int, data interface{}) error {
 		msg = ctx.String()
 	}
 
-	l.Debug(msg, " | ", http.StatusText(status))
+	log.Debug().Msgf("%s | %s", msg, http.StatusText(status))
 
 	return ctx.
 		Status(status).
@@ -56,49 +55,49 @@ func request(ctx *fiber.Ctx, l log.Logger, status int, data interface{}) error {
 }
 
 func (r *Reply) BadRequest(ctx *fiber.Ctx, err error) error {
-	return request(ctx, r.l, http.StatusBadRequest, err)
+	return request(ctx, http.StatusBadRequest, err)
 }
 
 func (r *Reply) InternalServerError(ctx *fiber.Ctx, err error) error {
-	return request(ctx, r.l, http.StatusInternalServerError, err)
+	return request(ctx, http.StatusInternalServerError, err)
 }
 
 func (r *Reply) OK(ctx *fiber.Ctx, data any) error {
-	return request(ctx, r.l, http.StatusOK, data)
+	return request(ctx, http.StatusOK, data)
 }
 
 func (r *Reply) Created(ctx *fiber.Ctx, data any) error {
-	return request(ctx, r.l, http.StatusCreated, data)
+	return request(ctx, http.StatusCreated, data)
 }
 
 func (r *Reply) NoContent(ctx *fiber.Ctx, err error) error {
-	return request(ctx, r.l, http.StatusNoContent, err)
+	return request(ctx, http.StatusNoContent, err)
 }
 
 func (r *Reply) NotFound(ctx *fiber.Ctx, err error) error {
-	return request(ctx, r.l, http.StatusNotFound, err)
+	return request(ctx, http.StatusNotFound, err)
 }
 
 func (r *Reply) Unauthorized(ctx *fiber.Ctx, err error) error {
-	return request(ctx, r.l, http.StatusUnauthorized, err)
+	return request(ctx, http.StatusUnauthorized, err)
 }
 
 func (r *Reply) Forbidden(ctx *fiber.Ctx, err error) error {
-	return request(ctx, r.l, http.StatusForbidden, err)
+	return request(ctx, http.StatusForbidden, err)
 }
 
 func (r *Reply) Conflict(ctx *fiber.Ctx, err error) error {
-	return request(ctx, r.l, http.StatusConflict, err)
+	return request(ctx, http.StatusConflict, err)
 }
 
 func (r *Reply) UnprocessableEntity(ctx *fiber.Ctx, err error) error {
-	return request(ctx, r.l, http.StatusUnprocessableEntity, err)
+	return request(ctx, http.StatusUnprocessableEntity, err)
 }
 
 func (r *Reply) TooManyRequests(ctx *fiber.Ctx, err error) error {
-	return request(ctx, r.l, http.StatusTooManyRequests, err)
+	return request(ctx, http.StatusTooManyRequests, err)
 }
 
 func (r *Reply) ServiceUnavailable(ctx *fiber.Ctx, err error) error {
-	return request(ctx, r.l, http.StatusServiceUnavailable, err)
+	return request(ctx, http.StatusServiceUnavailable, err)
 }

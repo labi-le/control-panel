@@ -2,11 +2,11 @@ package main
 
 import (
 	"context"
+	"errors"
 	"flag"
 	"github.com/gofiber/fiber/v2"
 	"github.com/labi-le/control-panel/internal"
-	"github.com/labi-le/control-panel/pkg/log"
-	"go.uber.org/zap"
+	"github.com/rs/zerolog/log"
 	"os"
 	"os/signal"
 )
@@ -28,18 +28,16 @@ func main() {
 	flag.Parse()
 
 	if versionFlag == true {
-		log.Info(internal.PanelVersion)
+		log.Info().Msgf("Version: %s", internal.PanelVersion)
 		return
 	}
 
 	conf, err := internal.NewPanelSettings(config)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal().Err(err)
 	}
 
 	checkPermissions()
-
-	logger := MustLogger(log.New())
 
 	// Setting up signal capturing
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
@@ -51,38 +49,23 @@ func main() {
 	go func() {
 		err := srv.Listen(conf.GetAddr() + ":" + conf.GetPort())
 		if err != nil {
-			logger.Fatal(err)
+			log.Fatal().Err(err)
 		}
 	}()
 
 	<-ctx.Done()
-	// Waiting for SIGINT (kill -2)
-	logger.Info("Gracefully shutdown server...")
+	log.Info().Msgf("Gracefully shutdown server...")
 
 	if err := srv.Shutdown(); err != nil {
-		logger.Fatal(err)
+		log.Fatal().Err(err)
 	}
 
 }
+
+var ErrPermissionDenied = errors.New("permission denied")
 
 func checkPermissions() {
 	if os.Geteuid() != 0 {
-		log.Fatal("You must run this program as root")
+		log.Fatal().Err(ErrPermissionDenied)
 	}
-}
-
-func MustLogger(l log.Logger) log.Logger {
-	if debugMode {
-		devlogger, err := zap.NewDevelopment(zap.IncreaseLevel(zap.DebugLevel))
-		if err != nil {
-			panic(err.Error())
-		}
-
-		l = log.NewWithZap(devlogger)
-		l.Info("debug mode enabled")
-	}
-
-	log.SetGlobalLog(l)
-
-	return l
 }
