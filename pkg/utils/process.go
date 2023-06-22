@@ -39,7 +39,7 @@ func ManageProc(cmd *overseer.Cmd, over *overseer.Overseer, w io.Writer) error {
 
 func MonitorState(over *overseer.Overseer, fn func(state *overseer.ProcessJSON) string) {
 	status := make(chan *overseer.ProcessJSON)
-	over.Watch(status)
+	over.WatchState(status)
 
 	go func() {
 		for state := range status {
