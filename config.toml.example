@@ -1,0 +1,5 @@
+language = "en"
+logvel = "info"
+port = 7777
+dashboard_delay = 1s
+addr = "0.0.0.0"
