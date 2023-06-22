@@ -1,4 +1,4 @@
-package structures
+package types
 
 // Response is a struct that contains the response from the server.
 type Response struct {

@@ -1,4 +1,4 @@
-package structures
+package types
 
 // Memory in kibibyte
 type Memory struct {

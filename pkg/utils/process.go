@@ -2,14 +2,15 @@ package utils
 
 import (
 	"github.com/ShinyTrinkets/overseer"
+	"github.com/labi-le/control-panel/pkg/log"
 	"io"
 	"time"
 )
 
 func init() {
-	overseer.SetupLogBuilder(func(name string) overseer.Logger {
-		return Log()
-	})
+	//overseer.SetupLogBuilder(func(name string) overseer.Logger {
+	//	return log.GlobalLog
+	//})
 }
 
 func ManageProc(cmd *overseer.Cmd, over *overseer.Overseer, w io.Writer) error {
@@ -42,7 +43,7 @@ func MonitorState(over *overseer.Overseer, fn func(state *overseer.ProcessJSON) 
 
 	go func() {
 		for state := range status {
-			Log().Infof("%v\n", state)
+			log.Infof("%v\n", state)
 			fn(state)
 		}
 	}()

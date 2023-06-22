@@ -3,24 +3,23 @@ package main
 import (
 	"context"
 	"flag"
-	"fmt"
+	"github.com/gofiber/fiber/v2"
 	"github.com/labi-le/control-panel/internal"
-	router "github.com/labi-le/control-panel/internal/http"
-	"github.com/labi-le/control-panel/internal/http/api"
-	"github.com/labi-le/control-panel/pkg"
-	"github.com/labi-le/control-panel/pkg/utils"
-	"net/http"
+	"github.com/labi-le/control-panel/pkg/log"
+	"go.uber.org/zap"
 	"os"
 	"os/signal"
-	"time"
 )
 
 var (
 	config      string
 	versionFlag bool
+	// Режим отладки всего приложения, sql запросы
+	debugMode bool
 )
 
 func init() {
+	flag.BoolVar(&debugMode, "debug", false, "debug mode")
 	flag.StringVar(&config, "config", internal.DefaultConfigPath, "path to config file")
 	flag.BoolVar(&versionFlag, "version", false, "print version and exit")
 }
@@ -29,47 +28,61 @@ func main() {
 	flag.Parse()
 
 	if versionFlag == true {
-		fmt.Println(internal.PanelVersion)
+		log.Info(internal.PanelVersion)
 		return
 	}
 
 	conf, err := internal.NewPanelSettings(config)
 	if err != nil {
-		utils.Log().Fatal(err)
+		log.Fatal(err)
 	}
 
-	// Configure global logger
-	utils.ConfigureLogger(conf.GetLogLevel())
+	checkPermissions()
 
-	checkSudo()
+	logger := MustLogger(log.New())
 
-	resolver := api.NewMethods(conf)
-	srv := pkg.NewServer(router.GetRoutes(resolver), conf)
+	// Setting up signal capturing
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
+	defer stop()
+
+	srv := fiber.New(fiber.Config{})
+	internal.RegisterHandlers(srv, conf)
 
 	go func() {
-		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			utils.Log().Fatal(err)
+		err := srv.Listen(conf.GetAddr() + ":" + conf.GetPort())
+		if err != nil {
+			logger.Fatal(err)
 		}
 	}()
 
-	// Setting up signal capturing
-	stop := make(chan os.Signal, 1)
-	signal.Notify(stop, os.Interrupt)
-
+	<-ctx.Done()
 	// Waiting for SIGINT (kill -2)
-	<-stop
-	utils.Log().Info("Gracefully shutdown server...")
+	logger.Info("Gracefully shutdown server...")
 
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer cancel()
-	if err := srv.Shutdown(ctx); err != nil {
-		utils.Log().Fatal(err)
+	if err := srv.Shutdown(); err != nil {
+		logger.Fatal(err)
 	}
 
 }
 
-func checkSudo() {
+func checkPermissions() {
 	if os.Geteuid() != 0 {
-		utils.Log().Fatal("You must run this program as root")
+		log.Fatal("You must run this program as root")
 	}
+}
+
+func MustLogger(l log.Logger) log.Logger {
+	if debugMode {
+		devlogger, err := zap.NewDevelopment(zap.IncreaseLevel(zap.DebugLevel))
+		if err != nil {
+			panic(err.Error())
+		}
+
+		l = log.NewWithZap(devlogger)
+		l.Info("debug mode enabled")
+	}
+
+	log.SetGlobalLog(l)
+
+	return l
 }

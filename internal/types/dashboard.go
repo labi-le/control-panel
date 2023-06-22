@@ -1,4 +1,4 @@
-package structures
+package types
 
 type Dashboard struct {
 	CPULoad *CPULoad   `json:"cpu_load"`

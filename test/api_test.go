@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"github.com/labi-le/control-panel/internal"
 	"github.com/labi-le/control-panel/internal/http/api"
-	"github.com/labi-le/control-panel/internal/structures"
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
@@ -41,7 +40,7 @@ func TestMethods_GetVersion(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, rec.Code)
 
-	var v structures.Version
+	var v types.Version
 	if err := json.Unmarshal(rec.Body.Bytes(), &v); err != nil {
 		t.Error(err)
 	}
@@ -63,7 +62,7 @@ func TestMethods_GetDiskPartitions(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, rec.Code)
 
-	var p []structures.PartitionStat
+	var p []types.PartitionStat
 	if err := json.Unmarshal(rec.Body.Bytes(), &p); err != nil {
 		t.Error(err)
 	}

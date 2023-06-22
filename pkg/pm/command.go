@@ -1,4 +1,4 @@
-package api
+package pm
 
 import (
 	"github.com/ShinyTrinkets/overseer"
@@ -23,7 +23,7 @@ func PMCommand(c echo.Context, m *Methods, cmd Command) error {
 		}
 
 		over := overseer.NewOverseer()
-		utils.Log().Infof("Client connected %s", ws.Request().RemoteAddr)
+		log.Infof("Client connected %s", ws.Request().RemoteAddr)
 
 		cmd := over.Add(cmd.Name, cmd.Exec, cmd.Args, overOpt)
 
@@ -37,7 +37,7 @@ func PMCommand(c echo.Context, m *Methods, cmd Command) error {
 	return nil
 }
 
-func (m *Methods) UpdatePackage(c echo.Context) error {
+func (a *API) UpdatePackage(c echo.Context) error {
 	return PMCommand(c, m, Command{
 		Name: "update",
 		Exec: "apt",
@@ -48,7 +48,7 @@ func (m *Methods) UpdatePackage(c echo.Context) error {
 	})
 }
 
-func (m *Methods) InstallPackage(c echo.Context) error {
+func (a *API) InstallPackage(c echo.Context) error {
 	//return PMCommand(c, m, Command{
 	//	Name: "install",
 	//	Exec: "apt",
@@ -69,7 +69,7 @@ func (m *Methods) InstallPackage(c echo.Context) error {
 	})
 }
 
-func (m *Methods) DeletePackage(c echo.Context) error {
+func (m *API) DeletePackage(c echo.Context) error {
 	return PMCommand(c, m, Command{
 		Name: "remove",
 		Exec: "apt",

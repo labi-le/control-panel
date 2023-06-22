@@ -1,7 +1,7 @@
 package internal
 
 import (
-	"github.com/labi-le/control-panel/internal/structures"
+	"github.com/labi-le/control-panel/internal/types"
 	io "github.com/mackerelio/go-osstat/disk"
 	"github.com/mackerelio/go-osstat/memory"
 	"github.com/shirou/gopsutil/v3/cpu"
@@ -9,13 +9,13 @@ import (
 )
 
 // GetVirtualMemory returns virtual memory info
-func GetVirtualMemory() (*structures.Memory, error) {
+func GetVirtualMemory() (*types.Memory, error) {
 	mem, err := memory.Get()
 	if err != nil {
-		return &structures.Memory{}, err
+		return &types.Memory{}, err
 	}
 
-	return &structures.Memory{
+	return &types.Memory{
 		Total:  mem.Total,
 		Free:   mem.Free,
 		Used:   mem.Used,
@@ -29,13 +29,13 @@ func GetCPUInfo() ([]cpu.InfoStat, error) {
 }
 
 // GetCPULoad returns cpu load
-func GetCPULoad() (*structures.CPULoad, error) {
+func GetCPULoad() (*types.CPULoad, error) {
 	percent, err := cpu.Percent(0, false)
 	if err != nil {
 		return nil, err
 	}
 
-	return &structures.CPULoad{Load: percent[0]}, nil
+	return &types.CPULoad{Load: percent[0]}, nil
 }
 
 // GetDiskIO returns disk usage
@@ -44,15 +44,15 @@ func GetDiskIO() ([]io.Stats, error) {
 }
 
 // GetDiskPartitions returns disk partitions
-func GetDiskPartitions() ([]structures.PartitionStat, error) {
+func GetDiskPartitions() ([]types.PartitionStat, error) {
 	partitions, err := disk.Partitions(true)
 	if err != nil {
 		return nil, err
 	}
 
-	var result []structures.PartitionStat
+	var result []types.PartitionStat
 	for _, partition := range partitions {
-		result = append(result, structures.PartitionStat{
+		result = append(result, types.PartitionStat{
 			Device:     partition.Device,
 			Mountpoint: partition.Mountpoint,
 			Fstype:     partition.Fstype,
@@ -64,13 +64,13 @@ func GetDiskPartitions() ([]structures.PartitionStat, error) {
 }
 
 // GetDiskInfo returns disk info
-func GetDiskInfo(path string) (*structures.UsageStat, error) {
+func GetDiskInfo(path string) (*types.UsageStat, error) {
 	usage, err := disk.Usage(path)
 	if err != nil {
 		return nil, err
 	}
 
-	return &structures.UsageStat{
+	return &types.UsageStat{
 		Path:              usage.Path,
 		Fstype:            usage.Fstype,
 		Total:             usage.Total,

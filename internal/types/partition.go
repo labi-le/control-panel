@@ -1,4 +1,4 @@
-package structures
+package types
 
 type PartitionStat struct {
 	Device     string   `json:"device"`
