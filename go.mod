@@ -4,7 +4,6 @@ go 1.18
 
 require (
 	github.com/BurntSushi/toml v1.3.2
-	github.com/ShinyTrinkets/overseer v0.5.0
 	github.com/gofiber/contrib/websocket v1.0.0
 	github.com/gofiber/fiber/v2 v2.47.0
 	github.com/korovkin/limiter v0.0.0-20230307205149-3d4b2b34c99d
@@ -15,7 +14,6 @@ require (
 )
 
 require (
-	github.com/ShinyTrinkets/meta-logger v0.2.0 // indirect
 	github.com/andybalholm/brotli v1.0.5 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fasthttp/websocket v1.5.3 // indirect

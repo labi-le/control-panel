@@ -1,13 +1,7 @@
 github.com/BurntSushi/toml v1.3.2 h1:o7IhLm0Msx3BaB+n3Ag7L8EVlByGnpq14C4YWiu/gL8=
 github.com/BurntSushi/toml v1.3.2/go.mod h1:CxXYINrC8qIiEnFrOxCa7Jy5BFHlXnUU2pbicEuybxQ=
-github.com/ShinyTrinkets/meta-logger v0.2.0 h1:oR533+wuhSJ+vLsnSq1CBSGQygNv8nDsvuRUVcOls0g=
-github.com/ShinyTrinkets/meta-logger v0.2.0/go.mod h1:cY1KnpPfpLIopR+arZXHYVrVGO6AETrhi3HmRGFjU+U=
-github.com/ShinyTrinkets/overseer v0.5.0 h1:pgX1P5Ub+rgqhOFc5WLA0mPUwHEGMh9ltcgXOs/7aPU=
-github.com/ShinyTrinkets/overseer v0.5.0/go.mod h1:NB2kg7uXESqJYBC7Y+5cdCFTpCZBPwEsSdYnabfNOOw=
 github.com/andybalholm/brotli v1.0.5 h1:8uQZIdzKmjc/iuPu7O2ioW48L81FgatrcpfFmiq/cCs=
 github.com/andybalholm/brotli v1.0.5/go.mod h1:fO7iG3H7G2nSZ7m0zPUDn85XEX2GTukHGRSepvi9Eig=
-github.com/azer/is-terminal v1.0.0 h1:COvj8jmg2xMz0CqHn4Uu8X1m7Dmzmu0CpciBaLtJQBg=
-github.com/azer/logger v1.0.0 h1:3T4BnTLyndJWHajOyECt2kAhnvP30KCrVAkYcMjHrXk=
 github.com/coreos/go-systemd/v22 v22.5.0/go.mod h1:Y58oyj3AT4RCenI/lSvhwexgC+NSVTIJ3seZv2GcEnc=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
@@ -16,7 +10,6 @@ github.com/fasthttp/websocket v1.5.3 h1:TPpQuLwJYfd4LJPXvHDYPMFWbLjsT91n3GpWtCQt
 github.com/fasthttp/websocket v1.5.3/go.mod h1:46gg/UBmTU1kUaTcwQXpUxtRwG2PvIZYeA8oL6vF3Fs=
 github.com/go-ole/go-ole v1.2.6 h1:/Fpf6oFPoeFik9ty7siob0G6Ke8QvQEuVcuChpwXzpY=
 github.com/go-ole/go-ole v1.2.6/go.mod h1:pprOEPIfldk/42T2oK7lQ4v4JSDwmV0As9GaiUsvbm0=
-github.com/go-test/deep v1.0.8 h1:TDsG77qcSprGbC6vTN8OuXp5g+J+b5Pcguhf7Zt61VM=
 github.com/godbus/dbus/v5 v5.0.4/go.mod h1:xhWf0FNVPg57R7Z0UbKHbJfkEywrmjJnf7w5xrFpKfA=
 github.com/gofiber/contrib/websocket v1.0.0 h1:y9bbY5/KOvR84SrwPm/3+Q8/M4rxoJlz/eGQaezVrTk=
 github.com/gofiber/contrib/websocket v1.0.0/go.mod h1:5TICl8C33weKzAcZjAQ0dYCIbG/5DfghiDs+qvTbIpw=
