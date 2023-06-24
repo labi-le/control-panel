@@ -16,12 +16,9 @@ import (
 
 var (
 	config string
-	// Режим отладки всего приложения, sql запросы
-	debugMode bool
 )
 
 func init() {
-	flag.BoolVar(&debugMode, "debug", false, "debug mode")
 	flag.StringVar(&config, "config", internal.DefaultConfigPath(), "path to config file")
 }
 
@@ -69,6 +66,7 @@ func configureLogger(conf *internal.PanelSettings) {
 		level = zerolog.InfoLevel
 	}
 
+	log.Info().Msgf("log level set to %s", level)
 	zerolog.SetGlobalLevel(level)
 }
 
