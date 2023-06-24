@@ -1,24 +1,19 @@
 package pm
 
-type Pacman struct {
+import "os/exec"
+
+type pacman struct {
+	basemanager
 }
 
-func (p *Pacman) Install(name string) error {
-	//TODO implement me
-	panic("implement me")
+func (p *pacman) Install(pkg ...string) *exec.Cmd {
+	return p.execute(append([]string{"-S", "--noconfirm"}, pkg...)...)
 }
 
-func (p *Pacman) Uninstall(name string) error {
-	//TODO implement me
-	panic("implement me")
+func (p *pacman) Uninstall(pkg ...string) *exec.Cmd {
+	return p.execute(append([]string{"-Rs", "--noconfirm"}, pkg...)...)
 }
 
-func (p *Pacman) Update() error {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (p *Pacman) Custom(command string, args ...string) error {
-	//TODO implement me
-	panic("implement me")
+func (p *pacman) Update() *exec.Cmd {
+	return p.execute("-Syu", "--noconfirm")
 }

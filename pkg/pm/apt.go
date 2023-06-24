@@ -1,24 +1,19 @@
 package pm
 
-type APT struct {
+import "os/exec"
+
+type apt struct {
+	basemanager
 }
 
-func (a *APT) Install(name string) error {
-	//TODO implement me
-	panic("implement me")
+func (a *apt) Install(pkg ...string) *exec.Cmd {
+	return a.execute(append([]string{"install", "-y"}, pkg...)...)
 }
 
-func (a *APT) Uninstall(name string) error {
-	//TODO implement me
-	panic("implement me")
+func (a *apt) Uninstall(pkg ...string) *exec.Cmd {
+	return a.execute(append([]string{"remove", "-y"}, pkg...)...)
 }
 
-func (a *APT) Update() error {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (a *APT) Custom(command string, args ...string) error {
-	//TODO implement me
-	panic("implement me")
+func (a *apt) Update() *exec.Cmd {
+	return a.execute("update", "-y")
 }
