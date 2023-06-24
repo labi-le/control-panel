@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/labi-le/control-panel/internal"
+	"github.com/labi-le/control-panel/pkg/pm"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"os"
@@ -43,7 +44,7 @@ func main() {
 	defer stop()
 
 	srv := fiber.New(fiber.Config{})
-	internal.RegisterHandlers(srv, conf)
+	internal.RegisterHandlers(srv, conf, pm.MustManager())
 
 	go func() {
 		err := srv.Listen(fmt.Sprintf("%s:%d", conf.GetAddr(), conf.GetPort()))

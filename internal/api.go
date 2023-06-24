@@ -5,22 +5,26 @@ import (
 	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
 	"github.com/labi-le/control-panel/internal/types"
+	"github.com/labi-le/control-panel/pkg/pm"
 	"github.com/labi-le/control-panel/pkg/response"
 	"github.com/labi-le/control-panel/pkg/utils"
 	"github.com/rs/zerolog/log"
 	"net/http"
+	"os/exec"
 	"syscall"
 	"time"
 )
 
 type API struct {
-	reply   *response.Reply
-	service *PanelSettings
+	reply         *response.Reply
+	panelSettings *PanelSettings
+	pm            pm.PackageManager
 }
 
 func RegisterHandlers(
 	r fiber.Router,
-	service *PanelSettings,
+	panelSettings *PanelSettings,
+	pm pm.PackageManager,
 ) {
 
 	if utils.IsDirExist(ProductionStaticPath) {
@@ -30,14 +34,15 @@ func RegisterHandlers(
 	}
 
 	api := &API{
-		reply:   response.New(),
-		service: service,
+		reply:         response.New(),
+		panelSettings: panelSettings,
+		pm:            pm,
 	}
 
 	r.Add(http.MethodGet, "/ws/dashboard", websocket.New(api.GetDashboardInfo))
-	r.Add(http.MethodGet, "/ws/package/update", api.UpdatePackage)
-	r.Add(http.MethodGet, "/ws/package/install/:package", api.InstallPackage)
-	r.Add(http.MethodGet, "/ws/package/remove/:package", api.DeletePackage)
+	r.Add(http.MethodGet, "/ws/package/update", websocket.New(api.UpdatePackage))
+	r.Add(http.MethodGet, "/ws/package/install/:package", websocket.New(api.InstallPackage))
+	r.Add(http.MethodGet, "/ws/package/remove/:package", websocket.New(api.DeletePackage))
 
 	r.Add(http.MethodGet, "/api/disk_partitions", api.GetDiskPartitions)
 	r.Add(http.MethodGet, "/api/version", api.GetVersion)
@@ -46,7 +51,7 @@ func RegisterHandlers(
 func (a *API) successResponseWS(ws *websocket.Conn, d ...any) bool {
 	if err := ws.WriteJSON(d); err != nil {
 		if errors.Is(err, syscall.EPIPE) {
-			log.Info().Msgf("Client disconnected %s", ws.RemoteAddr())
+			log.Debug().Msgf("Client disconnected %s", ws.RemoteAddr())
 			return false
 		}
 		log.Error().Err(err)
@@ -73,8 +78,7 @@ func (a *API) GetVersion(c *fiber.Ctx) error {
 
 func (a *API) GetDashboardInfo(ws *websocket.Conn) {
 	defer ws.Close()
-
-	log.Info().Msgf("Client connected %s", ws.RemoteAddr())
+	log.Debug().Msgf("Client connected %s", ws.RemoteAddr())
 
 	var dashboard types.DashboardParams
 	if err := ws.ReadJSON(&dashboard); err != nil {
@@ -102,7 +106,7 @@ func (a *API) GetDashboardInfo(ws *websocket.Conn) {
 			break
 		}
 
-		time.Sleep(a.service.DashboardDelay)
+		time.Sleep(a.panelSettings.DashboardDelay)
 	}
 }
 
@@ -115,15 +119,67 @@ func (a *API) GetDiskPartitions(c *fiber.Ctx) error {
 	return a.reply.OK(c, dp)
 }
 
-func (a *API) UpdatePackage(ctx *fiber.Ctx) error {
-	panic("implement me")
+func (a *API) UpdatePackage(ws *websocket.Conn) {
+	defer ws.Close()
+	log.Debug().Msgf("Client connected %s", ws.RemoteAddr())
+
+	pipe(a.pm.Update(), ws)
+
 }
 
-func (a *API) InstallPackage(ctx *fiber.Ctx) error {
-	panic("implement me")
+func (a *API) InstallPackage(ws *websocket.Conn) {
+	defer ws.Close()
+	log.Debug().Msgf("Client connected %s", ws.RemoteAddr())
 
+	var pkgs []string
+	if err := ws.ReadJSON(&pkgs); err != nil {
+		log.Error().Err(err)
+		return
+	}
+
+	pipe(a.pm.Install(pkgs...), ws)
 }
 
-func (a *API) DeletePackage(ctx *fiber.Ctx) error {
-	panic("implement me")
+func (a *API) DeletePackage(ws *websocket.Conn) {
+	defer ws.Close()
+	log.Debug().Msgf("Client connected %s", ws.RemoteAddr())
+
+	var pkgs []string
+	if err := ws.ReadJSON(&pkgs); err != nil {
+		log.Error().Err(err)
+		return
+	}
+
+	pipe(a.pm.Uninstall(pkgs...), ws)
+}
+
+func pipe(cmd *exec.Cmd, ws *websocket.Conn) {
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		log.Error().Err(err)
+		return
+	}
+
+	if err := cmd.Start(); err != nil {
+		log.Error().Err(err)
+		return
+	}
+
+	for {
+		var b []byte
+		_, err := stdout.Read(b)
+		if err != nil {
+			log.Error().Err(err)
+			break
+		}
+
+		if err := ws.WriteMessage(websocket.TextMessage, b); err != nil {
+			log.Error().Err(err)
+			break
+		}
+	}
+
+	if err := cmd.Wait(); err != nil {
+		log.Error().Err(err)
+	}
 }
