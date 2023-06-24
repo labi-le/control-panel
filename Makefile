@@ -7,7 +7,7 @@ BUILD_PATH = build/package/
 INSTALL_PATH = /usr/local/bin/
 
 run:
-	go run -v $(MAIN_PATH)
+	go run -v $(MAIN_PATH) -config config.toml.example
 
 build-release: clean
 	@echo "Building..."
