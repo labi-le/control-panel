@@ -12,7 +12,6 @@ import (
 const (
 	ProductionStaticPath = "/opt/control-panel/static/"
 	DevelopStaticPath    = "./frontend/"
-	DefaultConfigName    = "config.toml"
 )
 
 type Config interface {
@@ -67,14 +66,14 @@ func NewPanelSettings(settingsPath string) (*PanelSettings, error) {
 	)
 
 	log.Debug().Msgf("Settings path: %s", settingsPath)
-	if _, err := os.Stat(settingsPath + DefaultConfigName); os.IsNotExist(err) {
-		file, err = createConfigFile(settingsPath, DefaultConfigName, DefaultPanelSettings())
+	if _, err := os.Stat(settingsPath); os.IsNotExist(err) {
+		file, err = createConfigFile(settingsPath, DefaultPanelSettings())
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	file, err := os.Open(settingsPath + DefaultConfigName)
+	file, err := os.Open(settingsPath)
 	if err != nil {
 		return nil, err
 	}
@@ -85,12 +84,12 @@ func NewPanelSettings(settingsPath string) (*PanelSettings, error) {
 	return &settings, err
 }
 
-func createConfigFile(path, name string, settings *PanelSettings) (io.Reader, error) {
+func createConfigFile(path string, settings *PanelSettings) (io.Reader, error) {
 	if err := os.MkdirAll(path, os.ModePerm); err != nil {
 		return nil, err
 	}
 
-	file, err := os.Create(path + name)
+	file, err := os.Create(path)
 	if err != nil {
 		return nil, err
 	}
@@ -121,5 +120,5 @@ func (p *PanelSettings) String() string {
 }
 
 func DefaultConfigPath() string {
-	return os.Getenv("HOME") + "/.config/control-panel/"
+	return os.Getenv("HOME") + "/.config/control-panel/config.toml"
 }
